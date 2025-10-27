@@ -3,11 +3,13 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 
 import HomeScreen from './screens/HomeScreen';
 import NewEntryScreen from './screens/NewEntryScreen';
+import SignUpScreen from './screens/SignUpScreen'; 
+import { supabase } from './config/supabase'; 
 
 const CalendarScreen = () => <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Calendar</Text></View>;
 const ReportsScreen = () => <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Reports</Text></View>;
@@ -32,7 +34,7 @@ function MainTabs({ navigation }) {
     <Tab.Navigator
       initialRouteName="HomeTab"
       screenOptions={{
-        headerShown: false, 
+        headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: styles.tabBar,
         tabBarActiveTintColor: '#007bff',
@@ -91,20 +93,59 @@ function MainTabs({ navigation }) {
 }
 
 export default function App() {
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+        setLoading(false);
+      }
+    );
+
+    return () => {
+        authListener?.subscription.unsubscribe();
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#007bff" />
+      </View>
+    );
+  }
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NavigationContainer>
         <RootStack.Navigator>
-          <RootStack.Screen 
-            name="Main" 
-            component={MainTabs} 
-            options={{ headerShown: false }} 
-          />
-          <RootStack.Screen 
-            name="NewEntry" 
-            component={NewEntryScreen} 
-            options={{ presentation: 'modal', headerShown: false }} 
-          />
+          {session ? (
+            <>
+              <RootStack.Screen 
+                name="Main" 
+                component={MainTabs} 
+                options={{ headerShown: false }} 
+              />
+              <RootStack.Screen 
+                name="NewEntry" 
+                component={NewEntryScreen} 
+                options={{ presentation: 'modal', headerShown: false }} 
+              />
+            </>
+          ) : (
+            <RootStack.Screen 
+              name="Auth" 
+              component={SignUpScreen} 
+              options={{ headerShown: false }} 
+            />
+          )}
         </RootStack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>
@@ -131,7 +172,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
   },
   tabBar: {
-    height: 90, 
+    height: 90,
     borderTopWidth: 0,
     elevation: 10,
     backgroundColor: '#fff',

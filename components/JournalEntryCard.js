@@ -1,66 +1,98 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
-export const tagColors = { 
-  Mood: '#d7f9d7', // Light Green
-  Meal: '#ffe9cc', // Light Orange
-  Activity: '#dbeeff', // Light Blue
-  Behavior: '#ffd6d6', // Light Red
-  Sleep: '#e8dfff', // Light Purple
-  Medication: '#dde7ff', // Light Steel Blue
-  Appointment: '#fff5d9', // Light Yellow
-  General: '#e5e5e5', // Light Gray
+dayjs.extend(relativeTime);
+
+export const tagColors = {
+    Mood: '#a3e635',       // Lime
+    Sleep: '#38bdf8',      // Sky
+    Medication: '#facc15', // Amber
+    Activity: '#4ade80',   // Emerald
+    Meal: '#fb923c',       // Orange
+    Behavior: '#f87171',   // Red
+    Appointment: '#a78bfa',// Violet
+    General: '#94a3b8',    // Slate
 };
 
+
 export default function JournalEntryCard({ entry }) {
-  return (
-    <View style={styles.card}>
-      <View style={styles.header}>
-        <Text style={styles.author}>{entry.author}</Text>
-        <Text style={styles.timestamp}>{entry.timeAgo}</Text>
-      </View>
+    const timeAgo = dayjs(entry.date).fromNow();
 
-      <Text style={styles.text}>{entry.details}</Text>
+    return (
+        <View style={styles.card}>
+            {entry.image_url && (
+                <Image 
+                    source={{ uri: entry.image_url }} 
+                    style={styles.entryImage} 
+                    resizeMode="cover"
+                    onError={(e) => console.error("Image Card Load Error:", e.nativeEvent.error)}
+                />
+            )}
+            
+            <Text style={styles.details}>{entry.details}</Text>
 
-      {entry.image && (
-        <Image source={{ uri: entry.image }} style={styles.image} />
-      )}
-
-      <View style={styles.tagsContainer}>
-        {entry.tags.map((tag) => (
-          <View key={tag} style={[styles.tag, { backgroundColor: tagColors[tag] || '#ccc' }]}>
-            <Text style={styles.tagText}>{tag}</Text>
-          </View>
-        ))}
-      </View>
-    </View>
-  );
+            <View style={styles.tagsContainer}>
+                {entry.tags && entry.tags.map((tag) => (
+                    <View 
+                        key={tag} 
+                        style={[styles.tag, { backgroundColor: tagColors[tag] || tagColors['General'] }]}
+                    >
+                        <Text style={styles.tagText}>{tag}</Text>
+                    </View>
+                ))}
+            </View>
+            
+            <Text style={styles.timestamp}>Posted {timeAgo}</Text>
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 }, 
-    shadowOpacity: 0.08, 
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  header: { flexDirection: 'row', justifyContent: 'space-between' },
-  author: { fontWeight: 'bold', color: '#333' },
-  timestamp: { color: '#999', fontSize: 12 },
-  text: { marginVertical: 8, color: '#444' },
-  image: { width: '100%', height: 180, borderRadius: 10, marginTop: 6 },
-  tagsContainer: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 8 },
-  tag: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginRight: 8,
-    marginBottom: 6,
-  },
-  tagText: { fontSize: 12, color: '#333' },
+    card: {
+        padding: 15,
+        borderRadius: 10,
+        backgroundColor: '#fff',
+        marginBottom: 10,
+        elevation: 2, 
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+    },
+    entryImage: {
+        width: '100%', 
+        height: 200, 
+        borderRadius: 8,
+        marginBottom: 12,
+    },
+    details: {
+        fontSize: 16,
+        color: '#333',
+        marginBottom: 10,
+        lineHeight: 22,
+    },
+    tagsContainer: { 
+        flexDirection: 'row', 
+        flexWrap: 'wrap', 
+        marginBottom: 8 
+    },
+    tag: {
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 15,
+        marginRight: 6,
+        marginBottom: 6,
+    },
+    tagText: { 
+        fontSize: 12, 
+        color: '#333',
+        fontWeight: '500',
+    },
+    timestamp: {
+        fontSize: 12,
+        color: '#999',
+        textAlign: 'right',
+    }
 });
