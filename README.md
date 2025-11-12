@@ -6,10 +6,11 @@ CareLink is a mobile app designed to support caregivers of patients with dementi
 
 ## Features
 
-- Track patient care and daily routines
-- Communicate with other caregivers
-- Manage tasks, appointments, and reminders
-- Support multiple caregiver roles (family, friends, professionals)
+- User accounts for caregivers
+- Chronological feed of entries to track patient information over time
+- Simple entry form to add new updates efficiently
+- Calendar view for a quick overview of past entries
+- Report tab with an AI-powered tool to generate summaries for any timeframe
 
 
 ---
