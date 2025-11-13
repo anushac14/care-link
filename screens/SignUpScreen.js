@@ -139,7 +139,26 @@ export default function SignUpScreen({ navigation }) {
       setLoading(false);
     }
   };
+
+  const handleResetPassword = async () => {
+    if (!form.username) {
+      return setError('Please enter your email to reset your password.');
+    }
   
+    setError('');
+    setLoading(true);
+  
+    try {
+      const { data, error } = await supabase.auth.resetPasswordForEmail(form.username);
+      if (error) throw error;
+  
+      alert('Check your email for a password reset link.');
+    } catch (e) {
+      setError(e.message || 'Failed to send reset email.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const renderAuthForm = (onSubmit) => (
     <>
@@ -171,6 +190,13 @@ export default function SignUpScreen({ navigation }) {
         value={form.password}
         onChangeText={(text) => updateForm('password', text)}
       />
+      {flow === 'SIGNIN' && (
+        <TouchableOpacity onPress={handleResetPassword}>
+          <Text style={styles.linkText}>
+            Forgot Password?
+          </Text>
+        </TouchableOpacity>
+      )}
       {/* Dynamic fields based on flow */}
       {flow === 'CREATE_GROUP' && (
         <>
@@ -335,6 +361,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 18,
     marginLeft: 10,
+  },
+  linkText: {
+    color: '#007bff',
+    fontSize: 14,
+    fontWeight: '500',
+    textAlign: 'center',
+    marginTop: 10,
   },
   actionButton: {
     flexDirection: 'row',
