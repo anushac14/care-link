@@ -212,7 +212,7 @@ export default function NewEntryScreen({ navigation }) {
             <Header />
             <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
                 <Text style={styles.patientInfo}>
-                    Posting to: **{patientData.name || 'Unknown Patient'}**'s Journal
+                    Posting to: {patientData.name || 'Unknown Patient'}'s Journal
                 </Text>
 
                 <Text style={styles.sectionTitle}>Select Tags</Text>

@@ -107,9 +107,6 @@ export default function HomeScreen({ navigation }) {
     };
 }, [navigation]);
 
-    const navigateToNewEntry = () => {
-        navigation.navigate('NewEntry');
-    };
 
     const renderEntry = ({ item }) => <JournalEntryCard entry={item} />;
 
@@ -138,10 +135,6 @@ export default function HomeScreen({ navigation }) {
                     </View>
                 )}
             />
-
-            <TouchableOpacity style={styles.fab} onPress={navigateToNewEntry}>
-                <Text style={styles.fabText}>+</Text>
-            </TouchableOpacity>
         </SafeAreaView>
     );
 }
