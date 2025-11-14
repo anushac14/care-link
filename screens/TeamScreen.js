@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Modal, TextInput } from 'react-native';
 import { supabase } from '../config/supabase';
 import TopBarLayout from '../components/TopBarLayout';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function TeamScreen() {
   const [teamMembers, setTeamMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [patientName, setPatientName] = useState('');
+  const [inviteModalVisible, setInviteModalVisible] = useState(false);
+  const [email, setEmail] = useState('');
+  const [sendingInvite, setSendingInvite] = useState(false);
 
   useEffect(() => {
     fetchTeamMembers();
@@ -71,9 +75,39 @@ export default function TeamScreen() {
   };
 
   const handleInvite = () => {
-    // Logic for inviting new members (send email, show modal, etc.)
-    console.log('Invite button pressed');
+    setInviteModalVisible(true);
   };
+
+  const sendInvite = async () => {
+    if (!email.trim()) {
+      Alert.alert('Error', 'Please enter an email address');
+      return;
+    }
+
+    setSendingInvite(true);
+    try {
+      // Here you would integrate with your email service
+      // For now, we'll simulate the process
+      
+      console.log('Sending invite to:', email);
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      Alert.alert(
+        'Invite Sent!',
+        `An invitation has been sent to ${email}. They'll be able to join the care team once they accept.`,
+        [{ text: 'OK', onPress: () => setInviteModalVisible(false) }]
+      );
+      
+      setEmail('');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to send invite. Please try again.');
+    } finally {
+      setSendingInvite(false);
+    }
+  };
+
 
   const getInitials = (name) => {
     return name.split(' ').map(word => word[0]).join('').toUpperCase();
@@ -119,6 +153,54 @@ export default function TeamScreen() {
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
         />
+
+        {/* Invite Modal */}
+        <Modal
+          visible={inviteModalVisible}
+          animationType="none"
+          transparent={true}
+          onRequestClose={() => setInviteModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Invite to Care Team</Text>
+                <TouchableOpacity 
+                  onPress={() => setInviteModalVisible(false)}
+                  style={styles.closeButton}
+                >
+                  <Ionicons name="close" size={24} color="#666" />
+                </TouchableOpacity>
+              </View>
+              
+              <Text style={styles.modalDescription}>
+                Invite caregivers or family members to join {patientName}'s care team
+              </Text>
+              
+              <TextInput
+                style={styles.emailInput}
+                placeholder="Enter email address"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              
+              <TouchableOpacity 
+                style={[styles.sendButton, sendingInvite && styles.sendButtonDisabled]}
+                onPress={sendInvite}
+                disabled={sendingInvite}
+              >
+                {sendingInvite ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text style={styles.sendButtonText}>Send Invite</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </View>
     </TopBarLayout>
   );
@@ -208,5 +290,61 @@ const styles = StyleSheet.create({
     color: '#fff', 
     fontWeight: 'bold',
     fontSize: 18,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 20,
+    width: '100%',
+    maxWidth: 400,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1a1a1a',
+  },
+  closeButton: {
+    padding: 5,
+  },
+  modalDescription: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 20,
+    lineHeight: 20,
+  },
+  emailInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  sendButton: {
+    backgroundColor: '#38496B',
+    padding: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  sendButtonDisabled: {
+    opacity: 0.6,
+  },
+  sendButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
