@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Alert, LogBox, Platform } from 'react-native';
 import { supabase } from '../config/supabase';
 import TopBarLayout from '../components/TopBarLayout';
+import Constants from "expo-constants";
+const GEMINI_API_KEY = Constants.expoConfig.extra.GEMINI_API_KEY;
 
 const callApiWithBackoff = async (apiCall, maxRetries = 3) => {
     for (let attempt = 0; attempt < maxRetries; attempt++) {
@@ -106,7 +108,7 @@ export default function ReportScreen({ navigation }) {
                 `[${new Date(e.date).toLocaleDateString()}] Tags: ${(e.tags || []).join(', ')} - Details: ${e.details || 'No details'}`
             ).join('\n---\n');
 
-            const apiKey = "";
+            const apiKey = GEMINI_API_KEY;
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
             const systemPrompt = "Act as a compassionate care analyst. You are summarizing journal entries for a dementia patient. Provide a professional, supportive, and concise summary focusing on key trends, behavioral patterns, recurring needs (e.g., sleep, activity), and overall mood observed in the entries. Use bullet points for key findings.";
