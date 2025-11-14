@@ -66,9 +66,7 @@ export default function ReportScreen({ navigation }) {
         getPatientInfo();
     }, [navigation]);
 
-    // --- API Call and Summary Generation ---
     const generateSummary = useCallback(async () => {
-        // Simple date validation check (YYYY-MM-DD format and valid patient)
         if (!patientData.patientId) {
             return Alert.alert("Error", "Patient data is missing.");
         }
@@ -80,22 +78,21 @@ export default function ReportScreen({ navigation }) {
         }
 
         setReportLoading(true);
-        setSummary(null); // Clear previous summary
+        setSummary(null); 
 
         try {
-            // 1. Fetch Entries from Supabase
-            // We use >= start date (inclusive) and < end date + 1 day (exclusive)
+           
             const nextDay = new Date(endDate);
             nextDay.setDate(nextDay.getDate() + 1);
             const endDateISO = nextDay.toISOString().substring(0, 10);
 
             const { data: entries, error: fetchError } = await supabase
                 .from('entries')
-                .select('created_at, details, tags')
+                .select('date, details, tags') 
                 .eq('patient_id', patientData.patientId)
-                .gte('created_at', startDate)
-                .lt('created_at', endDateISO)
-                .order('created_at', { ascending: true });
+                .gte('date', startDate)
+                .lt('date', endDateISO)
+                .order('date', { ascending: true });
 
             if (fetchError) throw fetchError;
             
@@ -105,12 +102,10 @@ export default function ReportScreen({ navigation }) {
                 return;
             }
 
-            // 2. Format Entries for the LLM Prompt
             const entriesText = entries.map(e => 
-                `[${new Date(e.created_at).toLocaleDateString()}] Tags: ${(e.tags || []).join(', ')} - Details: ${e.details || 'No details'}`
+                `[${new Date(e.date).toLocaleDateString()}] Tags: ${(e.tags || []).join(', ')} - Details: ${e.details || 'No details'}`
             ).join('\n---\n');
 
-            // 3. Prepare Gemini API Request
             const apiKey = "";
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
