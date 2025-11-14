@@ -4,14 +4,14 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native'; // Added Text for placeholders
 
 import HomeScreen from './screens/HomeScreen';
 import NewEntryScreen from './screens/NewEntryScreen';
 import SignUpScreen from './screens/SignUpScreen'; 
+import CalendarScreen from './screens/CalendarScreen'; 
 import { supabase } from './config/supabase'; 
 
-const CalendarScreen = () => <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Calendar</Text></View>;
 const ReportsScreen = () => <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Reports</Text></View>;
 const TeamScreen = () => <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Team</Text></View>;
 
@@ -52,7 +52,7 @@ function MainTabs({ navigation }) {
       />
       <Tab.Screen
         name="Calendar"
-        component={CalendarScreen}
+        component={CalendarScreen} 
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="calendar" size={size} color={color} />

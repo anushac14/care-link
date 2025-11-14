@@ -171,7 +171,6 @@ export default function SignUpScreen({ navigation }) {
         value={form.password}
         onChangeText={(text) => updateForm('password', text)}
       />
-      {/* Dynamic fields based on flow */}
       {flow === 'CREATE_GROUP' && (
         <>
           <Text style={styles.inputLabel}>Patient's Name</Text>
@@ -218,7 +217,7 @@ export default function SignUpScreen({ navigation }) {
   if (flow === 'MAIN') {
     content = (
       <>
-        <Text style={styles.welcomeText}>Welcome to CareTeam Journal</Text>
+        <Text style={styles.welcomeText}>Welcome to Care Link Journal</Text>
         <Text style={styles.subHeaderText}>Choose your entry point:</Text>
 
         <TouchableOpacity 
