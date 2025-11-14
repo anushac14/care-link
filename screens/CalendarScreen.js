@@ -3,9 +3,9 @@ import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, Act
 import { Ionicons } from '@expo/vector-icons';
 import dayjs from 'dayjs'; 
 import { supabase } from '../config/supabase';
+import TopBarLayout from '../components/TopBarLayout';
 
-const INITIAL_DATE = dayjs().format('YYYY-MM-DD'); 
-const PATIENT_NAME_PLACEHOLDER = "Brian"; 
+const INITIAL_DATE = dayjs().format('YYYY-MM-DD');
 
 const Tag = ({ text, color }) => (
     <View style={[calendarStyles.tag, { backgroundColor: color || '#eee' }]}>
@@ -20,6 +20,7 @@ export default function CalendarScreen({ navigation }) {
     const [dayEntries, setDayEntries] = useState(null); 
     const [loading, setLoading] = useState(false);
     const [patientId, setPatientId] = useState(null);
+    const [patientName, setPatientName] = useState('');
 
     useEffect(() => {
         const loadPatient = async () => {
@@ -37,6 +38,18 @@ export default function CalendarScreen({ navigation }) {
                 
                 if (userData) {
                     setPatientId(userData.patient_id);
+                    
+                    const { data: patientData, error: patientError } = await supabase
+                        .from('patients')
+                        .select('name')
+                        .eq('id', userData.patient_id)
+                        .single();
+                    
+                    if (patientError) throw patientError;
+                    
+                    if (patientData) {
+                        setPatientName(patientData.name);
+                    }
                 }
             } catch (e) {
                 console.error("Calendar Screen Load Error:", e);
@@ -136,17 +149,19 @@ export default function CalendarScreen({ navigation }) {
         );
     };
 
-    return (
-        <SafeAreaView style={calendarStyles.safeArea}>
-            <ScrollView style={calendarStyles.container}>
-                {/* Header */}
-                <View style={calendarStyles.appHeader}>
-                    <Text style={calendarStyles.patientName}>{PATIENT_NAME_PLACEHOLDER}'s Journal</Text>
-                    <View style={calendarStyles.avatar}>
-                        <Text style={calendarStyles.avatarText}>JS</Text> 
-                    </View>
-                </View>
+    const handleSignOut = async () => {
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
+        } catch (e) {
+            console.error("Sign Out Error:", e.message);
+            Alert.alert("Error", "Failed to sign out. Please try again.");
+        }
+    };
 
+    return (
+        <TopBarLayout patientName={patientName} onSignOut={handleSignOut}>
+            <ScrollView style={calendarStyles.container}>
                 {/* Month Navigation */}
                 <View style={calendarStyles.monthNavigator}>
                     <TouchableOpacity onPress={() => changeMonth('back')} style={calendarStyles.navButton}>
@@ -211,39 +226,14 @@ export default function CalendarScreen({ navigation }) {
                 
                 <View style={{ height: 100 }} /> 
             </ScrollView>
-        </SafeAreaView>
+        </TopBarLayout>
     );
 }
 
 // --- Styles ---
 
 const calendarStyles = StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: '#fff' },
     container: { paddingHorizontal: 15, flex: 1 },
-    
-    // App Header Styles
-    appHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingVertical: 10,
-    },
-    patientName: {
-        fontSize: 24,
-        fontWeight: 'bold',
-    },
-    avatar: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: '#ccc',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    avatarText: {
-        fontWeight: 'bold',
-        color: '#fff',
-    },
     
     // Month Navigator Styles
     monthNavigator: {

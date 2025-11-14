@@ -7,7 +7,7 @@ import TopBarLayout from '../components/TopBarLayout';
 export default function HomeScreen({ navigation }) {
     const [journalEntries, setJournalEntries] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [patientName, setPatientName] = useState('My');
+    const [patientName, setPatientName] = useState('');
 
     const fetchJournalData = async () => {
         setLoading(true);

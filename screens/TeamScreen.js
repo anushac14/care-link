@@ -6,7 +6,7 @@ import TopBarLayout from '../components/TopBarLayout';
 export default function TeamScreen() {
   const [teamMembers, setTeamMembers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [patientName, setPatientName] = useState('My');
+  const [patientName, setPatientName] = useState('');
 
   useEffect(() => {
     fetchTeamMembers();
