@@ -2,20 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { supabase } from '../config/supabase';
 import JournalEntryCard, { tagColors } from '../components/JournalEntryCard'; 
-import { Ionicons } from '@expo/vector-icons'; 
-
-const CustomHeader = ({ patientName, onSignOut }) => (
-  <View style={headerStyles.customHeaderContainer}>
-    <View style={headerStyles.headerContent}>
-      <Text style={headerStyles.headerTitle}>{patientName}'s Journal</Text> 
-      <Ionicons name="chevron-down" size={16} color="#333" style={{ marginLeft: 4 }} />
-    </View>
-    
-    <TouchableOpacity onPress={onSignOut} style={headerStyles.signOutButton}>
-        <Ionicons name="log-out-outline" size={24} color="#333" /> 
-    </TouchableOpacity>
-  </View>
-);
+import TopBarLayout from '../components/TopBarLayout';
 
 export default function HomeScreen({ navigation }) {
     const [journalEntries, setJournalEntries] = useState([]);
@@ -86,30 +73,27 @@ export default function HomeScreen({ navigation }) {
 
 
     useEffect(() => {
-    fetchJournalData();
-    
-    const channel = supabase
-        .channel('entries_changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'entries' }, (payload) => {
-            console.log('Change received via Realtime!', payload);
-            fetchJournalData(); 
-        })
-        .subscribe();
-        
-    const focusListener = navigation.addListener('focus', () => {
-        console.log('Screen focused, running fresh data fetch.');
         fetchJournalData();
-    });
+        
+        const channel = supabase
+            .channel('entries_changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'entries' }, (payload) => {
+                console.log('Change received via Realtime!', payload);
+                fetchJournalData(); 
+            })
+            .subscribe();
+            
+        const focusListener = navigation.addListener('focus', () => {
+            console.log('Screen focused, running fresh data fetch.');
+            fetchJournalData();
+        });
 
-    return () => {
-        supabase.removeChannel(channel);
-        focusListener(); 
-    };
-}, [navigation]);
+        return () => {
+            supabase.removeChannel(channel);
+            focusListener(); 
+        };
+    }, [navigation]);
 
-    const navigateToNewEntry = () => {
-        navigation.navigate('NewEntry');
-    };
 
     const renderEntry = ({ item }) => <JournalEntryCard entry={item} />;
 
@@ -123,9 +107,7 @@ export default function HomeScreen({ navigation }) {
     }
 
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <CustomHeader patientName={patientName} onSignOut={handleSignOut} />
-            
+        <TopBarLayout patientName={patientName} onSignOut={handleSignOut}>
             <FlatList
                 data={journalEntries}
                 keyExtractor={(item) => item.id.toString()}
@@ -138,39 +120,10 @@ export default function HomeScreen({ navigation }) {
                     </View>
                 )}
             />
-
-            <TouchableOpacity style={styles.fab} onPress={navigateToNewEntry}>
-                <Text style={styles.fabText}>+</Text>
-            </TouchableOpacity>
-        </SafeAreaView>
+        </TopBarLayout>
     );
 }
 
-
-const headerStyles = StyleSheet.create({
-    customHeaderContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 10,
-        backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
-    },
-    headerContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    headerTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: '#333',
-    },
-    signOutButton: {
-        padding: 5,
-    },
-});
 
 const styles = StyleSheet.create({
     safeArea: {
@@ -200,26 +153,5 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#999',
         marginTop: 5,
-    },
-    fab: {
-        position: 'absolute',
-        width: 60,
-        height: 60,
-        alignItems: 'center',
-        justifyContent: 'center',
-        right: 30,
-        bottom: 30,
-        backgroundColor: '#007bff',
-        borderRadius: 30,
-        elevation: 8,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
-    },
-    fabText: {
-        fontSize: 30,
-        color: 'white',
-        lineHeight: 30,
-    },
+    }
 });

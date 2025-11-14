@@ -3,17 +3,18 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native'; // Added Text for placeholders
 
 import HomeScreen from './screens/HomeScreen';
 import NewEntryScreen from './screens/NewEntryScreen';
+import TeamScreen from './screens/TeamScreen';
 import SignUpScreen from './screens/SignUpScreen'; 
 import CalendarScreen from './screens/CalendarScreen'; 
 import { supabase } from './config/supabase'; 
 
 const ReportsScreen = () => <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Reports</Text></View>;
-const TeamScreen = () => <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Team</Text></View>;
 
 const CustomAddButton = ({ children, onPress }) => (
   <TouchableOpacity
@@ -32,17 +33,17 @@ const RootStack = createStackNavigator();
 function MainTabs({ navigation }) {
   return (
     <Tab.Navigator
-      initialRouteName="HomeTab"
+      initialRouteName="Home"
       screenOptions={{
         headerShown: false,
-        tabBarShowLabel: false,
+        tabBarShowLabel: true,
         tabBarStyle: styles.tabBar,
-        tabBarActiveTintColor: '#007bff',
-        tabBarInactiveTintColor: '#999',
+        tabBarActiveTintColor: '#38496B',
+        tabBarInactiveTintColor: '#94A3B8',
       }}
     >
       <Tab.Screen
-        name="HomeTab"
+        name="Home"
         component={HomeScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
@@ -65,7 +66,7 @@ function MainTabs({ navigation }) {
         options={{
           tabBarButton: (props) => (
             <CustomAddButton {...props} onPress={() => navigation.navigate('NewEntry')}>
-              <Ionicons name="add" size={36} color="white" />
+              <MaterialIcons name="add" size={36} color="white" />
             </CustomAddButton>
           ),
         }}
@@ -159,7 +160,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   addButtonCircle: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#38496B',
     width: 65,
     height: 65,
     borderRadius: 32.5,
@@ -167,9 +168,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 5,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.40,
+    shadowRadius: 8,
   },
   tabBar: {
     height: 90,
