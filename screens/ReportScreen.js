@@ -1,6 +1,21 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Alert, LogBox, Platform } from 'react-native';
 import { supabase } from '../config/supabase';
+import TopBarLayout from '../components/TopBarLayout';
+
+const callApiWithBackoff = async (apiCall, maxRetries = 3) => {
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+            return await apiCall();
+        } catch (error) {
+            if (attempt === maxRetries - 1) throw error;
+            
+            // Exponential backoff: 1s, 2s, 4s
+            const delay = Math.pow(2, attempt) * 1000;
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
+    }
+};
 
 export default function ReportScreen({ navigation }) {
     const [patientData, setPatientData] = useState({ patientId: null, name: null });
@@ -92,7 +107,7 @@ export default function ReportScreen({ navigation }) {
 
             // 2. Format Entries for the LLM Prompt
             const entriesText = entries.map(e => 
-                `[${new Date(e.created_at).toLocaleDateString()}] Tags: ${e.tags.join(', ')} - Details: ${e.details}`
+                `[${new Date(e.created_at).toLocaleDateString()}] Tags: ${(e.tags || []).join(', ')} - Details: ${e.details || 'No details'}`
             ).join('\n---\n');
 
             // 3. Prepare Gemini API Request
@@ -157,17 +172,6 @@ export default function ReportScreen({ navigation }) {
         }
     }, [patientData.patientId, patientData.name, startDate, endDate]);
 
-    // --- UI Components ---
-    const Header = () => (
-        <View style={headerStyles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Text style={headerStyles.headerButtonText}>Back</Text>
-            </TouchableOpacity>
-            <Text style={headerStyles.headerTitle}>Journal Report</Text>
-            <View style={{ width: 60 }} /> {/* Spacer */}
-        </View>
-    );
-
     if (loading && !patientData.name) {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -176,9 +180,18 @@ export default function ReportScreen({ navigation }) {
         );
     }
 
+    const handleSignOut = async () => {
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
+        } catch (e) {
+            console.error("Sign Out Error:", e.message);
+            Alert.alert("Error", "Failed to sign out. Please try again.");
+        }
+    };
+
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-            <Header />
+        <TopBarLayout patientName={patientData.name} onSignOut={handleSignOut}>
             <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
                 <Text style={styles.patientInfo}>
                     Generating Report for: {patientData.name || 'Unknown Patient'}
@@ -247,29 +260,9 @@ export default function ReportScreen({ navigation }) {
                 
                 <View style={{ height: 50 }} />
             </ScrollView>
-        </SafeAreaView>
+        </TopBarLayout>
     );
 }
-
-const headerStyles = StyleSheet.create({
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        height: 44,
-        borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
-    },
-    headerTitle: {
-        fontWeight: '600',
-        fontSize: 17,
-    },
-    headerButtonText: {
-        fontSize: 17,
-        color: '#007bff',
-    },
-});
 
 
 const styles = StyleSheet.create({
@@ -306,7 +299,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     generateButton: {
-        backgroundColor: '#007bff',
+        backgroundColor: '#38496B',
         padding: 14,
         borderRadius: 10,
         alignItems: 'center',
@@ -360,7 +353,7 @@ const styles = StyleSheet.create({
     },
     sourceItem: {
         fontSize: 12,
-        color: '#007bff',
+        color: '#38496B',
         lineHeight: 18,
     }
 });

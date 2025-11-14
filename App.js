@@ -9,11 +9,13 @@ import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'rea
 
 import HomeScreen from './screens/HomeScreen';
 import NewEntryScreen from './screens/NewEntryScreen';
+import ReportsScreen from './screens/ReportScreen';
 import TeamScreen from './screens/TeamScreen';
 import SignUpScreen from './screens/SignUpScreen'; 
 import CalendarScreen from './screens/CalendarScreen'; 
 import { supabase } from './config/supabase'; 
 
+const CalendarScreen = () => <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Calendar</Text></View>;
 const ReportsScreen = () => <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Reports</Text></View>;
 
 const CustomAddButton = ({ children, onPress }) => (

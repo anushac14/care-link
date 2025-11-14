@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { supabase } from '../config/supabase';
-import TopBarLayout from '../components/TopBarLayout'; // Import TopBarLayout
+import TopBarLayout from '../components/TopBarLayout';
 
 export default function TeamScreen() {
   const [teamMembers, setTeamMembers] = useState([]);
