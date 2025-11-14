@@ -13,6 +13,7 @@ import ReportsScreen from './screens/ReportScreen';
 import TeamScreen from './screens/TeamScreen';
 import SignUpScreen from './screens/SignUpScreen'; 
 import CalendarScreen from './screens/CalendarScreen'; 
+import ProfileScreen from './screens/ProfileScreen';
 import { supabase } from './config/supabase'; 
 
 const CustomAddButton = ({ children, onPress }) => (
@@ -137,6 +138,11 @@ export default function App() {
                 name="NewEntry" 
                 component={NewEntryScreen} 
                 options={{ presentation: 'modal', headerShown: false }} 
+              />
+              <RootStack.Screen 
+                name="Profile" 
+                component={ProfileScreen} 
+                options={{ headerShown: false }} 
               />
             </>
           ) : (

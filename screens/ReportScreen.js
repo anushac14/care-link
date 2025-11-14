@@ -188,7 +188,7 @@ export default function ReportScreen({ navigation }) {
     };
 
     return (
-        <TopBarLayout patientName={patientData.name} onSignOut={handleSignOut}>
+        <TopBarLayout>
             <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
                 <Text style={styles.patientInfo}>
                     Generating Report for: {patientData.name || 'Unknown Patient'}

@@ -134,7 +134,7 @@ export default function TeamScreen() {
   }
 
   return (
-    <TopBarLayout patientName={patientName} onSignOut={handleSignOut}>
+    <TopBarLayout>
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <View style={styles.headerTextContainer}>

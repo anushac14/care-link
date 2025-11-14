@@ -107,7 +107,7 @@ export default function HomeScreen({ navigation }) {
     }
 
     return (
-        <TopBarLayout patientName={patientName} onSignOut={handleSignOut}>
+        <TopBarLayout>
             <FlatList
                 data={journalEntries}
                 keyExtractor={(item) => item.id.toString()}

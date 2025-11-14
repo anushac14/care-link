@@ -160,7 +160,7 @@ export default function CalendarScreen({ navigation }) {
     };
 
     return (
-        <TopBarLayout patientName={patientName} onSignOut={handleSignOut}>
+        <TopBarLayout>
             <ScrollView style={calendarStyles.container}>
                 {/* Month Navigation */}
                 <View style={calendarStyles.monthNavigator}>
