@@ -9,12 +9,12 @@ import { View, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-nat
 
 import HomeScreen from './screens/HomeScreen';
 import NewEntryScreen from './screens/NewEntryScreen';
+import TeamScreen from './screens/TeamScreen';
 import SignUpScreen from './screens/SignUpScreen'; 
 import { supabase } from './config/supabase'; 
 
 const CalendarScreen = () => <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Calendar</Text></View>;
 const ReportsScreen = () => <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Reports</Text></View>;
-const TeamScreen = () => <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Team</Text></View>;
 
 const CustomAddButton = ({ children, onPress }) => (
   <TouchableOpacity
