@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { supabase } from '../config/supabase';
+import TopBarLayout from '../components/TopBarLayout'; // Import TopBarLayout
 
 export default function TeamScreen() {
   const [teamMembers, setTeamMembers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [patientName, setPatientName] = useState('My');
 
   useEffect(() => {
     fetchTeamMembers();
@@ -17,7 +19,7 @@ export default function TeamScreen() {
     if (!user) throw new Error("User not authenticated.");
     
     try {
-        // Get user's data
+        // Get user's data and patient name
         const { data: userData, error: userError } = await supabase
         .from('users')
         .select('patient_id')
@@ -25,12 +27,23 @@ export default function TeamScreen() {
         .single();
 
         if (userError || !userData) {
-        console.error(userError);
-        Alert.alert("Error", "Could not load user patient id");
-        return;
+          console.error(userError);
+          Alert.alert("Error", "Could not load user patient id");
+          return;
         }
 
         const patientId = userData.patient_id;
+
+        // Fetch patient name for the top bar
+        const { data: patientData, error: patientError } = await supabase
+          .from('patients')
+          .select('name')
+          .eq('id', patientId)
+          .single();
+
+        if (!patientError && patientData) {
+          setPatientName(patientData.name);
+        }
 
         const { data, error } = await supabase
         .from('users')
@@ -41,8 +54,19 @@ export default function TeamScreen() {
         setTeamMembers(data);
     } catch (e) {
       console.error('Error fetching team members:', e);
+      Alert.alert("Error", "Could not load team members");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+    } catch (e) {
+      console.error("Sign Out Error:", e.message);
+      Alert.alert("Error", "Failed to sign out. Please try again.");
     }
   };
 
@@ -76,25 +100,27 @@ export default function TeamScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <View style={styles.headerTextContainer}>
-          <Text style={styles.header}>Care Team</Text>
-          <Text style={styles.subHeader}>{teamMembers.length} Members</Text>
+    <TopBarLayout patientName={patientName} onSignOut={handleSignOut}>
+      <View style={styles.container}>
+        <View style={styles.headerContainer}>
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.header}>Care Team</Text>
+            <Text style={styles.subHeader}>{teamMembers.length} Members</Text>
+          </View>
+          <TouchableOpacity style={styles.inviteButton} onPress={handleInvite}>
+            <Text style={styles.inviteText}>+  Invite</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.inviteButton} onPress={handleInvite}>
-          <Text style={styles.inviteText}>+  Invite</Text>
-        </TouchableOpacity>
+        
+        <FlatList
+          data={teamMembers}
+          keyExtractor={(item) => item.user_id}
+          renderItem={renderMember}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+        />
       </View>
-      
-      <FlatList
-        data={teamMembers}
-        keyExtractor={(item) => item.user_id}
-        renderItem={renderMember}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      />
-    </View>
+    </TopBarLayout>
   );
 }
 
@@ -103,7 +129,6 @@ const styles = StyleSheet.create({
     flex: 1, 
     padding: 20, 
     backgroundColor: '#fff',
-    paddingTop: 60,
   },
   loadingContainer: { 
     flex: 1, 
@@ -114,7 +139,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 15, // Reduced from 30
+    marginBottom: 15,
   },
   headerTextContainer: {
     flex: 1,
@@ -123,7 +148,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#1a1a1a',
-    marginBottom: 4, // Reduced from 8
+    marginBottom: 4,
   },
   subHeader: {
     fontSize: 14,
