@@ -15,9 +15,6 @@ import SignUpScreen from './screens/SignUpScreen';
 import CalendarScreen from './screens/CalendarScreen'; 
 import { supabase } from './config/supabase'; 
 
-const CalendarScreen = () => <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Calendar</Text></View>;
-const ReportsScreen = () => <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Reports</Text></View>;
-
 const CustomAddButton = ({ children, onPress }) => (
   <TouchableOpacity
     style={styles.addButton}
