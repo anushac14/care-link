@@ -64,16 +64,6 @@ export default function TeamScreen() {
     }
   };
 
-  const handleSignOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-    } catch (e) {
-      console.error("Sign Out Error:", e.message);
-      Alert.alert("Error", "Failed to sign out. Please try again.");
-    }
-  };
-
   const handleInvite = () => {
     setInviteModalVisible(true);
   };

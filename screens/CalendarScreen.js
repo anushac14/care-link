@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import dayjs from 'dayjs'; 
 import { supabase } from '../config/supabase';
 import TopBarLayout from '../components/TopBarLayout';
 
-const INITIAL_DATE = dayjs().format('YYYY-MM-DD');
+// Import the same tagColors from JournalEntryCard
+const tagColors = {
+    Mood: '#D9E7B9',
+    Sleep: '#E2D2F3',
+    Medication: '#D2DFFF',
+    Activity: '#D2EBF3',
+    Meal: '#FBD9A6',
+    Behavior: '#FFCBCC',
+    Appointment: '#FEEBB8'
+};
 
-const Tag = ({ text, color }) => (
-    <View style={[calendarStyles.tag, { backgroundColor: color || '#eee' }]}>
-        <Text style={calendarStyles.tagText}>{text}</Text>
-    </View>
-);
+const INITIAL_DATE = dayjs().format('YYYY-MM-DD');
 
 export default function CalendarScreen({ navigation }) {
     const [viewDate, setViewDate] = useState(dayjs(INITIAL_DATE));
@@ -124,39 +129,67 @@ export default function CalendarScreen({ navigation }) {
         setViewDate(viewDate.add(direction === 'forward' ? 1 : -1, 'month'));
     };
 
-    const renderEntry = (entry) => {
-        const authorName = entry.author?.name || 'Caregiver';
-        const initials = authorName.match(/\b\w/g).join('').substring(0, 2).toUpperCase();
-        
-        return (
-            <View key={entry.id} style={calendarStyles.entryCard}>
-                <View style={calendarStyles.entryHeader}>
-                    <View style={calendarStyles.entryAvatar}>
-                        <Text style={calendarStyles.avatarText}>{initials}</Text>
-                    </View>
-                    <View style={calendarStyles.entryMeta}>
-                        <Text style={calendarStyles.entryAuthor}>{authorName}</Text>
-                        <Text style={calendarStyles.entryTime}>
-                            {dayjs(entry.date).format('h:mm a')}
-                        </Text>
-                    </View>
-                </View>
-                <Text style={calendarStyles.entryDetails}>{entry.details}</Text>
-                {entry.tags && entry.tags.map(tag => (
-                    <Tag key={tag} text={tag} />
-                ))}
-            </View>
-        );
+    const getInitials = (name) => {
+        if (!name) return "??";
+        const parts = name.trim().split(" ");
+        return parts.length === 1
+            ? parts[0][0].toUpperCase()
+            : (parts[0][0] + parts[1][0]).toUpperCase();
     };
 
-    const handleSignOut = async () => {
-        try {
-            const { error } = await supabase.auth.signOut();
-            if (error) throw error;
-        } catch (e) {
-            console.error("Sign Out Error:", e.message);
-            Alert.alert("Error", "Failed to sign out. Please try again.");
-        }
+    const renderEntry = (entry) => {
+        const authorName = entry.author?.name || 'Caregiver';
+        
+        return (
+            <View key={entry.id} style={calendarStyles.card}>
+                {/* HEADER (Avatar + Name + Time) */}
+                <View style={calendarStyles.headerRow}>
+                    <View style={calendarStyles.avatar}>
+                        <Text style={calendarStyles.avatarText}>
+                            {getInitials(authorName)}
+                        </Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                        <Text style={calendarStyles.name}>{authorName}</Text>
+                    </View>
+                    <Text style={calendarStyles.time}>
+                        {dayjs(entry.date).format('h:mm a')} {/* Actual clock time */}
+                    </Text>
+                </View>
+
+                {/* ENTRY IMAGE (if exists) */}
+                {entry.image_url && (
+                    <Image
+                        source={{ uri: entry.image_url }}
+                        style={calendarStyles.entryImage}
+                        resizeMode="cover"
+                        onError={(e) =>
+                            console.error("Image Load Error:", e.nativeEvent.error)
+                        }
+                    />
+                )}
+
+                {/* ENTRY TEXT */}
+                <Text style={[calendarStyles.details, calendarStyles.bodyIndent]}>
+                    {entry.details}
+                </Text>
+
+                {/* TAGS */}
+                <View style={[calendarStyles.tagsContainer, calendarStyles.bodyIndent]}>
+                    {entry.tags?.map((tag) => (
+                        <View
+                            key={tag}
+                            style={[
+                                calendarStyles.tag,
+                                { backgroundColor: tagColors[tag] || '#eee' },
+                            ]}
+                        >
+                            <Text style={calendarStyles.tagText}>{tag}</Text>
+                        </View>
+                    ))}
+                </View>
+            </View>
+        );
     };
 
     return (
@@ -230,10 +263,14 @@ export default function CalendarScreen({ navigation }) {
     );
 }
 
-// --- Styles ---
+// --- Styles (updated to match JournalEntryCard) ---
 
 const calendarStyles = StyleSheet.create({
-    container: { paddingHorizontal: 15, flex: 1 },
+    container: { 
+        paddingHorizontal: 15, 
+        flex: 1,
+        backgroundColor: '#f9f9f9',
+    },
     
     // Month Navigator Styles
     monthNavigator: {
@@ -243,11 +280,15 @@ const calendarStyles = StyleSheet.create({
         paddingVertical: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
+        backgroundColor: '#fff',
+        marginHorizontal: -15,
+        paddingHorizontal: 15,
     },
     navButton: { padding: 5 },
     currentMonth: {
         fontSize: 18,
         fontWeight: '600',
+        color: '#38496B',
     },
     
     // Calendar Grid Styles
@@ -255,6 +296,10 @@ const calendarStyles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         paddingTop: 10,
+        backgroundColor: '#fff',
+        marginHorizontal: -15,
+        paddingHorizontal: 15,
+        paddingBottom: 10,
     },
     dayHeader: {
         width: '14.2%',
@@ -267,6 +312,10 @@ const calendarStyles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         paddingVertical: 10,
+        backgroundColor: '#fff',
+        marginHorizontal: -15,
+        paddingHorizontal: 15,
+        marginBottom: 10,
     },
     dateCell: {
         width: '14.2%', 
@@ -294,66 +343,103 @@ const calendarStyles = StyleSheet.create({
         color: '#999',
     },
     
-    // Entry List Styles
+    // Entry List Header
     dayHeaderTitle: {
         fontSize: 18,
-        fontWeight: 'bold',
-        marginVertical: 15,
-        paddingTop: 5,
+        fontWeight: '700',
+        color: '#38496B',
+        letterSpacing: 0.5,
+        marginBottom: 16,
+        marginTop: 10,
     },
-    entryCard: {
-        backgroundColor: '#f8f8f8',
-        borderRadius: 10,
-        padding: 15,
-        marginBottom: 10,
+    
+    // Entry Card Styles (matching JournalEntryCard)
+    card: {
+        padding: 16,
+        borderRadius: 12,
+        backgroundColor: '#fff',
+        marginBottom: 14,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
     },
-    entryHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 8,
+    
+    /* HEADER */
+    headerRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginBottom: 12,
     },
-    entryAvatar: {
-        width: 30,
-        height: 30,
-        borderRadius: 15,
-        backgroundColor: '#6b21a8', 
-        justifyContent: 'center',
-        alignItems: 'center',
+    avatar: {
+        width: 36,
+        height: 36,
+        borderRadius: 21,
+        backgroundColor: "#d9d9d9",
+        justifyContent: "center",
+        alignItems: "center",
         marginRight: 10,
     },
-    entryMeta: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        flex: 1,
-        justifyContent: 'space-between',
-    },
-    entryAuthor: {
-        fontWeight: 'bold',
-        fontSize: 14,
-    },
-    entryTime: {
-        fontSize: 12,
-        color: '#666',
-    },
-    entryDetails: {
+    avatarText: {
         fontSize: 16,
-        marginBottom: 8,
+        fontWeight: "600",
+        color: "#333",
+    },
+    name: {
+        fontSize: 16,
+        fontWeight: "600",
+        color: "#000",
+    },
+    time: {
+        fontSize: 13,
+        color: "#888",
+    },
+    
+    /* IMAGE */
+    entryImage: {
+        width: "100%",
+        height: 180,
+        borderRadius: 10,
+        marginBottom: 12,
+        marginTop: 4,
+    },
+    
+    bodyIndent: {
+        paddingLeft: 42,
+    },
+    
+    /* TEXT */
+    details: {
+        fontSize: 15,
+        color: '#333',
+        lineHeight: 20,
+        marginBottom: 10,
+    },
+    
+    /* TAGS */
+    tagsContainer: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        marginTop: 6,
     },
     tag: {
-        backgroundColor: '#ffdddd',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 15,
-        alignSelf: 'flex-start',
+        paddingHorizontal: 11,
+        paddingVertical: 6,
+        borderRadius: 18,
+        marginRight: 7,
+        marginBottom: 7,
     },
     tagText: {
-        fontSize: 12,
-        color: '#cc0000',
-        fontWeight: '500',
+        fontSize: 12.5,
+        color: "#333",
+        fontWeight: "500",
     },
+    
     emptyState: {
         textAlign: 'center',
         color: '#666',
         marginTop: 20,
+        fontSize: 16,
     }
 });

@@ -1,13 +1,64 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, SectionList, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { supabase } from '../config/supabase';
 import JournalEntryCard, { tagColors } from '../components/JournalEntryCard'; 
 import TopBarLayout from '../components/TopBarLayout';
+import dayjs from 'dayjs';
 
 export default function HomeScreen({ navigation }) {
-    const [journalEntries, setJournalEntries] = useState([]);
+    const [journalSections, setJournalSections] = useState([]);
     const [loading, setLoading] = useState(true);
     const [patientName, setPatientName] = useState('');
+
+    // Function to group entries by date
+    const groupEntriesByDate = (entries) => {
+        const grouped = {};
+        
+        entries.forEach(entry => {
+            // Get date string in YYYY-MM-DD format (ignoring time)
+            const dateKey = dayjs(entry.date).format('YYYY-MM-DD');
+            
+            if (!grouped[dateKey]) {
+                grouped[dateKey] = [];
+            }
+            
+            grouped[dateKey].push(entry);
+        });
+        
+        // Convert to array of sections
+        const sections = Object.keys(grouped)
+            .sort((a, b) => b.localeCompare(a)) // Sort dates descending (newest first)
+            .map(dateKey => {
+                const entriesForDate = grouped[dateKey];
+                
+                // Sort entries within each date by time (newest first)
+                entriesForDate.sort((a, b) => 
+                    new Date(b.date) - new Date(a.date)
+                );
+                
+                return {
+                    date: dateKey,
+                    title: formatDateHeader(dateKey),
+                    data: entriesForDate
+                };
+            });
+        
+        return sections;
+    };
+
+    // Format date for header display
+    const formatDateHeader = (dateString) => {
+        const today = dayjs().format('YYYY-MM-DD');
+        const yesterday = dayjs().subtract(1, 'day').format('YYYY-MM-DD');
+        
+        if (dateString === today) {
+            return 'Today';
+        } else if (dateString === yesterday) {
+            return 'Yesterday';
+        } else {
+            return dayjs(dateString).format('MMMM D');
+        }
+    };
 
     const fetchJournalData = async () => {
         setLoading(true);
@@ -40,18 +91,27 @@ export default function HomeScreen({ navigation }) {
             const { data: entries, error: entriesError } = await supabase
             .from('entries')
             .select(`
-                id, 
-                date, 
-                details, 
-                tags, 
-                author_id,
-                image_url
+                id,
+                date,
+                details,
+                tags,
+                image_url,
+                author:author_id(name)
             `)
             .eq('patient_id', patientId)
             .order('date', { ascending: false });
 
             if (entriesError) throw entriesError;
-            setJournalEntries(entries);
+
+            // Add author_name property to each entry
+            const formattedEntries = entries.map(e => ({
+                ...e,
+                author_name: e.author?.name || "Unknown"
+            }));
+
+            // Group entries by date
+            const sections = groupEntriesByDate(formattedEntries);
+            setJournalSections(sections);
 
         } catch (e) {
             console.error("Home Screen Fetch Error:", e);
@@ -60,17 +120,6 @@ export default function HomeScreen({ navigation }) {
             setLoading(false);
         }
     };
-    
-    const handleSignOut = async () => {
-        try {
-          const { error } = await supabase.auth.signOut();
-          if (error) throw error;
-        } catch (e) {
-          console.error("Sign Out Error:", e.message);
-          Alert.alert("Error", "Failed to sign out. Please try again.");
-        }
-    };
-
 
     useEffect(() => {
         fetchJournalData();
@@ -94,8 +143,15 @@ export default function HomeScreen({ navigation }) {
         };
     }, [navigation]);
 
-
+    // Render each entry
     const renderEntry = ({ item }) => <JournalEntryCard entry={item} />;
+
+    // Render section header
+    const renderSectionHeader = ({ section }) => (
+        <View style={styles.sectionHeader}>
+            <Text style={styles.sectionHeaderText}>{section.title}</Text>
+        </View>
+    );
 
     if (loading) {
         return (
@@ -108,11 +164,13 @@ export default function HomeScreen({ navigation }) {
 
     return (
         <TopBarLayout>
-            <FlatList
-                data={journalEntries}
+            <SectionList
+                sections={journalSections}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={renderEntry}
+                renderSectionHeader={renderSectionHeader}
                 contentContainerStyle={styles.listContent}
+                stickySectionHeadersEnabled={false}
                 ListEmptyComponent={() => (
                     <View style={styles.emptyContainer}>
                         <Text style={styles.emptyText}>No entries yet.</Text>
@@ -123,7 +181,6 @@ export default function HomeScreen({ navigation }) {
         </TopBarLayout>
     );
 }
-
 
 const styles = StyleSheet.create({
     safeArea: {
@@ -153,5 +210,18 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#999',
         marginTop: 5,
-    }
+    },
+    sectionHeader: {
+        backgroundColor: '#f9f9f9',
+        paddingVertical: 12,
+        paddingHorizontal: 0,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+    },
+    sectionHeaderText: {
+        fontSize: 20,
+        fontWeight: '700',
+        color: '#38496B',
+        letterSpacing: 0.5,
+    },
 });
