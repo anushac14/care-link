@@ -151,29 +151,6 @@ export default function SignUpScreen({ navigation }) {
     }
   };
 
-  const handleResetPassword = async () => {
-    if (!form.username) {
-      return setError('Please enter your email to reset your password.');
-    }
-  
-    setError('');
-    setLoading(true);
-  
-    try {
-      const { data, error } = await supabase.auth.resetPasswordForEmail(form.username);
-      if (error) throw error;
-  
-      showInfoModal(
-        'Check Your Email',
-        'A password reset link has been sent to your email address. Please check your inbox and follow the instructions.'
-      );
-    } catch (e) {
-      setError(e.message || 'Failed to send reset email.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const renderAuthForm = (onSubmit) => (
     <View style={styles.formContainer}>
       {flow !== 'SIGNIN' && (
@@ -204,13 +181,6 @@ export default function SignUpScreen({ navigation }) {
         value={form.password}
         onChangeText={(text) => updateForm('password', text)}
       />
-      {flow === 'SIGNIN' && (
-        <TouchableOpacity onPress={handleResetPassword} style={styles.forgotPasswordButton}>
-          <Text style={styles.linkText}>
-            Forgot Password?
-          </Text>
-        </TouchableOpacity>
-      )}
       
       {/* Dynamic fields based on flow */}
       {flow === 'CREATE_GROUP' && (
@@ -539,11 +509,6 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     fontSize: 16,
     color: '#1a1a1a',
-  },
-  forgotPasswordButton: {
-    alignSelf: 'flex-end',
-    marginTop: 12,
-    padding: 8,
   },
   linkText: {
     color: '#38496B',
