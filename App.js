@@ -13,7 +13,8 @@ import ReportsScreen from './screens/ReportScreen';
 import TeamScreen from './screens/TeamScreen';
 import SignUpScreen from './screens/SignUpScreen'; 
 import CalendarScreen from './screens/CalendarScreen'; 
-import ProfileScreen from './screens/ProfileScreen';
+import ProfileScreen from './screens/ProfilePage/ProfileScreen';
+import EditProfileScreen from './screens/ProfilePage/EditProfileScreen';
 import { supabase } from './config/supabase'; 
 
 const CustomAddButton = ({ children, onPress }) => (
@@ -144,6 +145,11 @@ export default function App() {
                 component={ProfileScreen} 
                 options={{ headerShown: false }} 
               />
+              <RootStack.Screen 
+                name="EditProfile" 
+                component={EditProfileScreen} 
+                options={{ headerShown: false }} 
+              />
             </>
           ) : (
             <RootStack.Screen 
@@ -174,7 +180,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.40,
+    shadowOpacity: 0.20,
     shadowRadius: 8,
   },
   tabBar: {

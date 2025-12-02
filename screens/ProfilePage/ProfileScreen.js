@@ -1,9 +1,13 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { supabase } from '../config/supabase';
+import { supabase } from '../../config/supabase';
 
 export default function ProfileScreen({ navigation }) {
+  const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [loading, setLoading] = useState(true);
+  
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
@@ -12,12 +16,74 @@ export default function ProfileScreen({ navigation }) {
     }
   };
 
+  const getInitials = (name) => {
+    if (!name) return "??";
+    const parts = name.trim().split(" ");
+    return parts.length === 1
+      ? parts[0][0].toUpperCase()
+      : (parts[0][0] + parts[1][0]).toUpperCase();
+  };
+
+  const fetchUserData = async () => {
+    setLoading(true);
+    try {
+      const user = (await supabase.auth.getSession()).data.session?.user;
+      if (!user) {
+        navigation.navigate('Auth');
+        return;
+      }
+
+      // Get user's email from auth
+      setUserEmail(user.email || '');
+
+      // Get user's name from users table
+      const { data: userData, error } = await supabase
+        .from('users')
+        .select('name')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) throw error;
+      
+      if (userData) {
+        setUserName(userData.name || '');
+      }
+    } catch (error) {
+      console.error('Profile fetch error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+    
+    const focusListener = navigation.addListener('focus', () => {
+      fetchUserData();
+    });
+
+    return () => {
+      focusListener();
+    };
+  }, [navigation]);
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#38496B" />
+          <Text style={{ marginTop: 10, color: '#38496B' }}>Loading profile...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Ionicons name="chevron-back" size={24} color="#333" />
+            <Ionicons name="chevron-back" size={24} color="#38496B" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Profile</Text>
           <View style={{ width: 24 }} />
@@ -26,15 +92,30 @@ export default function ProfileScreen({ navigation }) {
         <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
           <View style={styles.profileSection}>
             <View style={styles.profileInfo}>
-              <Text style={styles.profileName}>John Smith</Text>
-              <Text style={styles.profileEmail}>johnsmith@gmail.com</Text>
-              <TouchableOpacity style={styles.editButton}>
-                <Text style={styles.editButtonText}>Edit Profile</Text>
-              </TouchableOpacity>
+              <View style={styles.profileRow}>
+                <View style={styles.avatarContainer}>
+                  <View style={styles.avatar}>
+                    <Text style={styles.avatarText}>{getInitials(userName)}</Text>
+                  </View>
+                </View>
+                <View style={styles.profileDetails}>
+                  <Text style={styles.profileName}>{userName}</Text>
+                  <Text style={styles.profileEmail}>{userEmail}</Text>
+                  <TouchableOpacity 
+                    style={styles.editButton}
+                    onPress={() => navigation.navigate('EditProfile', { 
+                      name: userName, 
+                      email: userEmail 
+                    })}
+                  >
+                    <Text style={styles.editButtonText}>Edit Profile</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
           </View>
 
-          <View style={styles.divider} />
+          <View style={styles.sectionDivider} />
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>App Settings</Text>
@@ -56,7 +137,7 @@ export default function ProfileScreen({ navigation }) {
             </View>
           </View>
 
-          <View style={styles.divider} />
+          <View style={styles.sectionDivider} />
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Account & Privacy</Text>
@@ -74,6 +155,11 @@ export default function ProfileScreen({ navigation }) {
                 <Ionicons name="chevron-forward" size={20} color="#999" />
               </View>
             </View>
+          </View>
+
+          <View style={styles.sectionDivider} />
+
+          <View style={styles.section}>
             <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
               <Text style={styles.logoutText}>Log out</Text>
             </TouchableOpacity>
@@ -86,15 +172,12 @@ export default function ProfileScreen({ navigation }) {
   );
 }
 
-
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F8F8',
   },
   container: {
     flex: 1,
-    backgroundColor: '#F8F8F8',
   },
   header: {
     flexDirection: 'row',
@@ -104,7 +187,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
-    backgroundColor: '#F8F8F8',
   },
   backButton: {
     padding: 4,
@@ -112,11 +194,10 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: '600',
-    color: '#000',
+    color: '#38496B',
   },
   scrollContent: {
     flex: 1,
-    backgroundColor: '#F8F8F8',
   },
   profileSection: {
     paddingHorizontal: 20,
@@ -124,53 +205,74 @@ const styles = StyleSheet.create({
   },
   section: {
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingVertical: 12,
   },
   sectionTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 16,
+    fontSize: 15,
+    color: '#38496B',
+    marginBottom: 12,
+  },
+  sectionDivider: {
+    height: 2,
+    backgroundColor: '#e0e0e0',
+    marginHorizontal: 20,
+    marginVertical: 8,
   },
   profileInfo: {
-    backgroundColor: '#fff',
     borderRadius: 8,
     padding: 16,
+  },
+  profileRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  avatarContainer: {
+    marginRight: 16,
+  },
+  avatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 60,
+    backgroundColor: "#d9d9d9",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  avatarText: {
+    fontSize: 24,
+    fontWeight: "600",
+    color: "#333",
+  },
+  profileDetails: {
+    flex: 1,
   },
   profileName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#000',
+    color: '#38496B',
     marginBottom: 4,
   },
   profileEmail: {
     fontSize: 14,
-    color: '#666',
+    color: '#38496B',
     marginBottom: 12,
   },
   editButton: {
     alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderColor: '#38496B',
+    borderRadius: 6,
+    paddingHorizontal: 50,
+    paddingVertical: 6,
   },
   editButtonText: {
     fontSize: 14,
-    color: '#007AFF',
+    color: '#38496B',
     fontWeight: '500',
-  },
-  divider: {
-    height: 8,
-    backgroundColor: '#F8F8F8',
   },
   settingGroup: {
     marginBottom: 0,
   },
-  subsectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#000',
-    marginBottom: 12,
-  },
   settingsList: {
-    backgroundColor: '#fff',
     borderRadius: 8,
     overflow: 'hidden',
   },
@@ -178,27 +280,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: 12,
     paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
   },
   settingLabel: {
     fontSize: 16,
-    color: '#000',
-    fontWeight: '400',
+    color: '#38496B',
+    fontWeight: '600',
   },
   logoutButton: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    paddingVertical: 16,
+    backgroundColor: 'transparent',
+    paddingVertical: 10,
     paddingHorizontal: 16,
-    marginTop: 16,
-    alignItems: 'center',
+    alignSelf: 'flex-start',
   },
   logoutText: {
     fontSize: 16,
-    color: '#000',
-    fontWeight: '500',
+    color: '#FF3B30',
+    fontWeight: '700',
   },
 });

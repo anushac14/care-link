@@ -6,13 +6,13 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 
 export const tagColors = {
-    Mood: '#D9E7B9',
-    Sleep: '#E2D2F3',
-    Medication: '#D2DFFF',
-    Activity: '#D2EBF3',
-    Meal: '#FBD9A6',
-    Behavior: '#FFCBCC',
-    Appointment: '#FEEBB8'
+    Mood: '#42B826',
+    Sleep: '#957CF4',
+    Medication: '#416ECF',
+    Activity: '#85BEFF',
+    Meal: '#F3932C',
+    Behavior: '#DE3627',
+    Appointment: '#EEB62B'
 };
 
 export default function JournalEntryCard({ entry }) {
@@ -106,18 +106,18 @@ const styles = StyleSheet.create({
         width: 32,
         height: 32,
         borderRadius: 21,
-        backgroundColor: "#d9d9d9",
+        backgroundColor: "#38496B",
         justifyContent: "center",
         alignItems: "center",
         marginRight: 8,
     },
     avatarText: {
-        fontSize: 16,
-        fontWeight: "600",
-        color: "#333",
+        fontSize: 14,
+        fontWeight: "500",
+        color: "#fff",
     },
     name: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: "600",
         color: "#000",
     },
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     },
     tagText: {
         fontSize: 13,
-        color: "#333",
+        color: "#fff",
         fontWeight: "500",
     },
 });

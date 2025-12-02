@@ -5,15 +5,14 @@ import dayjs from 'dayjs';
 import { supabase } from '../config/supabase';
 import TopBarLayout from '../components/TopBarLayout';
 
-// Import the same tagColors from JournalEntryCard
 const tagColors = {
-    Mood: '#D9E7B9',
-    Sleep: '#E2D2F3',
-    Medication: '#D2DFFF',
-    Activity: '#D2EBF3',
-    Meal: '#FBD9A6',
-    Behavior: '#FFCBCC',
-    Appointment: '#FEEBB8'
+    Mood: '#42B826',
+    Sleep: '#957CF4',
+    Medication: '#416ECF',
+    Activity: '#85BEFF',
+    Meal: '#F3932C',
+    Behavior: '#DE3627',
+    Appointment: '#EEB62B'
 };
 
 const INITIAL_DATE = dayjs().format('YYYY-MM-DD');
@@ -263,7 +262,7 @@ export default function CalendarScreen({ navigation }) {
     );
 }
 
-// --- Styles (updated to match JournalEntryCard) ---
+// --- Styles ---
 
 const calendarStyles = StyleSheet.create({
     container: { 
@@ -353,7 +352,7 @@ const calendarStyles = StyleSheet.create({
         marginTop: 10,
     },
     
-    // Entry Card Styles (matching JournalEntryCard)
+    // Entry Card Styles
     card: {
         padding: 16,
         borderRadius: 12,
@@ -376,7 +375,7 @@ const calendarStyles = StyleSheet.create({
         width: 36,
         height: 36,
         borderRadius: 21,
-        backgroundColor: "#d9d9d9",
+        backgroundColor: "#38496B",
         justifyContent: "center",
         alignItems: "center",
         marginRight: 10,
@@ -384,7 +383,7 @@ const calendarStyles = StyleSheet.create({
     avatarText: {
         fontSize: 16,
         fontWeight: "600",
-        color: "#333",
+        color: "#fff",
     },
     name: {
         fontSize: 16,
@@ -432,7 +431,7 @@ const calendarStyles = StyleSheet.create({
     },
     tagText: {
         fontSize: 12.5,
-        color: "#333",
+        color: "#fff",
         fontWeight: "500",
     },
     

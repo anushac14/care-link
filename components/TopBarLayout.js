@@ -1,4 +1,3 @@
-// components/TopBarLayout.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,29 +6,51 @@ import { useNavigation } from '@react-navigation/native';
 
 export default function TopBarLayout({ children, showTopBar = true }) {
   const [patientName, setPatientName] = useState('My');
+  const [userInitials, setUserInitials] = useState('U');
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
 
   useEffect(() => {
-    fetchPatientName();
+    fetchData();
   }, []);
 
-  const fetchPatientName = async () => {
+  const getInitials = (name) => {
+    if (!name) return "U";
+    const parts = name.trim().split(" ");
+    return parts.length === 1
+      ? parts[0][0].toUpperCase()
+      : (parts[0][0] + parts[1][0]).toUpperCase();
+  };
+
+  const fetchData = async () => {
     try {
       const user = (await supabase.auth.getSession()).data.session?.user;
       if (!user) return;
 
+      // Get user's name for initials
       const { data: userData } = await supabase
+        .from('users')
+        .select('name')
+        .eq('user_id', user.id)
+        .single();
+
+      if (userData && userData.name) {
+        const initials = getInitials(userData.name);
+        setUserInitials(initials);
+      }
+
+      // Get patient's name for header
+      const { data: userPatientData } = await supabase
         .from('users')
         .select('patient_id')
         .eq('user_id', user.id)
         .single();
 
-      if (userData) {
+      if (userPatientData) {
         const { data: patientData } = await supabase
           .from('patients')
           .select('name')
-          .eq('id', userData.patient_id)
+          .eq('id', userPatientData.patient_id)
           .single();
 
         if (patientData) {
@@ -37,7 +58,7 @@ export default function TopBarLayout({ children, showTopBar = true }) {
         }
       }
     } catch (error) {
-      console.error('Error fetching patient name:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
@@ -58,14 +79,13 @@ export default function TopBarLayout({ children, showTopBar = true }) {
           <View style={styles.headerContent}>
             <>
               <Text style={styles.headerTitle}>{patientName}'s Journal</Text>
-              <Ionicons name="chevron-down" size={16} color="#38496B" style={{ marginLeft: 4 }} />
             </>
           </View>
           
           <TouchableOpacity onPress={handleProfilePress} style={styles.profileButton}>
             <View style={styles.profileAvatar}>
               <Text style={styles.profileInitial}>
-                {patientName ? patientName.charAt(0).toUpperCase() : 'U'}
+                {userInitials}
               </Text>
             </View>
           </TouchableOpacity>
@@ -120,7 +140,7 @@ const styles = StyleSheet.create({
   profileInitial: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "500",
   },
   content: {
     flex: 1,
