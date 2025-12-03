@@ -1,4 +1,4 @@
-// components/CustomText.js - USE THIS VERSION
+// components/CustomText.js
 import React from 'react';
 import { Text } from 'react-native';
 import { useFontSize } from '../contexts/FontSizeContext';
