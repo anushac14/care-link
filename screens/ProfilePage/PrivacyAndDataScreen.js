@@ -4,52 +4,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../config/supabase';
 
 export default function PrivacyAndDataScreen({ navigation }) {
-  const [userName, setUserName] = useState('');
-  const [userEmail, setUserEmail] = useState('');
   const [loading, setLoading] = useState(true);
   
-  const fetchUserData = async () => {
-    setLoading(true);
-    try {
-      const user = (await supabase.auth.getSession()).data.session?.user;
-      if (!user) {
-        navigation.navigate('Auth');
-        return;
-      }
-
-      // Get user's email from auth
-      setUserEmail(user.email || '');
-
-      // Get user's name from users table
-      const { data: userData, error } = await supabase
-        .from('users')
-        .select('name')
-        .eq('user_id', user.id)
-        .single();
-
-      if (error) throw error;
-      
-      if (userData) {
-        setUserName(userData.name || '');
-      }
-    } catch (error) {
-      console.error('Profile fetch error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchUserData();
-    
-    const focusListener = navigation.addListener('focus', () => {
-      fetchUserData();
-    });
-
-    return () => {
-      focusListener();
-    };
-  }, [navigation]);
+    setLoading(false);
+  }, []);
 
   if (loading) {
     return (
@@ -73,7 +32,24 @@ export default function PrivacyAndDataScreen({ navigation }) {
         </View>
 
         <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
-          
+          <View style={styles.section}>
+            <View style={styles.settingGroup}>
+              <View style={styles.settingsList}>
+                <TouchableOpacity style={styles.settingItem}>
+                  <Text style={styles.settingLabel}>
+                    Privacy Policy
+                  </Text>
+                  <Ionicons name="chevron-forward" size={20} color="#999" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.settingItem}>
+                  <Text style={styles.settingLabel}>
+                    Terms of Service
+                  </Text>
+                  <Ionicons name="chevron-forward" size={20} color="#999" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -106,6 +82,34 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flex: 1,
+  },
+  section: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    color: '#38496B',
+    marginBottom: 12,
+  },
+  settingGroup: {
+    marginBottom: 0,
+  },
+  settingsList: {
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  settingItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  settingLabel: {
+    fontSize: 16,
+    color: '#38496B',
+    fontWeight: '600',
   },
   loadingContainer: {
     flex: 1,

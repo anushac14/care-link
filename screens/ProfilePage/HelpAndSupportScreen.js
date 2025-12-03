@@ -1,55 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../config/supabase';
 
 export default function HelpAndSupportScreen({ navigation }) {
-  const [userName, setUserName] = useState('');
-  const [userEmail, setUserEmail] = useState('');
   const [loading, setLoading] = useState(true);
   
-  const fetchUserData = async () => {
-    setLoading(true);
-    try {
-      const user = (await supabase.auth.getSession()).data.session?.user;
-      if (!user) {
-        navigation.navigate('Auth');
-        return;
-      }
-
-      // Get user's email from auth
-      setUserEmail(user.email || '');
-
-      // Get user's name from users table
-      const { data: userData, error } = await supabase
-        .from('users')
-        .select('name')
-        .eq('user_id', user.id)
-        .single();
-
-      if (error) throw error;
-      
-      if (userData) {
-        setUserName(userData.name || '');
-      }
-    } catch (error) {
-      console.error('Profile fetch error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchUserData();
-    
-    const focusListener = navigation.addListener('focus', () => {
-      fetchUserData();
-    });
+    setLoading(false);
+  }, []);
 
-    return () => {
-      focusListener();
-    };
-  }, [navigation]);
 
   if (loading) {
     return (
@@ -73,7 +33,40 @@ export default function HelpAndSupportScreen({ navigation }) {
         </View>
 
         <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
-          
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Help</Text>
+            <View style={styles.settingGroup}>
+              <View style={styles.settingsList}>
+                <TouchableOpacity style={styles.settingItem}>
+                  <Text style={styles.settingLabel}>
+                    How-To Guide
+                  </Text>
+                  <Ionicons name="chevron-forward" size={20} color="#999" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.sectionDivider} />
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Contact Us</Text>
+            <View style={styles.settingGroup}>
+              <TouchableOpacity 
+                style={styles.emailButton}
+              >
+                <Text style={styles.emailButtonText}>Send us an email</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={styles.sectionDivider} />
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>About</Text>
+            <Text style={styles.versionText}>App Version: 1.0.0</Text>
+          </View>
+
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -104,6 +97,52 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#38496B',
   },
+  section: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    color: '#38496B',
+    marginBottom: 12,
+  },
+  settingGroup: {
+    marginBottom: 0,
+  },
+  settingsList: {
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  settingItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  settingLabel: {
+    fontSize: 16,
+    color: '#38496B',
+    fontWeight: '600',
+  },
+  emailButton: {
+    backgroundColor: '#e7e7e7ff',
+    borderRadius: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+  },
+  emailButtonText: {
+    fontSize: 16,
+    color: '#38496B',
+    fontWeight: '600',
+  },
+  sectionDivider: {
+    height: 2,
+    backgroundColor: '#e0e0e0',
+    marginHorizontal: 20,
+    marginVertical: 8,
+  },
   scrollContent: {
     flex: 1,
   },
@@ -111,5 +150,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  versionText: {
+    fontSize: 16,
+    color: '#666',
+    marginTop: 4,
   },
 });
