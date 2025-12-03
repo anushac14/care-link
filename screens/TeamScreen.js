@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Modal, TextInput } from 'react-native';
+import { View, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Modal, TextInput } from 'react-native';
 import { supabase } from '../config/supabase';
 import TopBarLayout from '../components/TopBarLayout';
 import { Ionicons } from '@expo/vector-icons';
+import CustomText from '../components/CustomText';
 
 export default function TeamScreen() {
   const [teamMembers, setTeamMembers] = useState([]);
@@ -98,7 +99,6 @@ export default function TeamScreen() {
     }
   };
 
-
   const getInitials = (name) => {
     return name.split(' ').map(word => word[0]).join('').toUpperCase();
   };
@@ -106,11 +106,13 @@ export default function TeamScreen() {
   const renderMember = ({ item }) => (
     <View style={styles.memberContainer}>
       <View style={styles.avatar}>
-        <Text style={styles.avatarText}>{getInitials(item.name)}</Text>
+        <CustomText size={1.1} style={styles.avatarText}>
+          {getInitials(item.name)}
+        </CustomText>
       </View>
       <View style={styles.memberInfo}>
-        <Text style={styles.memberName}>{item.name}</Text>
-        <Text style={styles.memberRole}>{item.role}</Text>
+        <CustomText size="h4" style={styles.memberName}>{item.name}</CustomText>
+        <CustomText size="body" style={styles.memberRole}>{item.role}</CustomText>
       </View>
     </View>
   );
@@ -128,11 +130,14 @@ export default function TeamScreen() {
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <View style={styles.headerTextContainer}>
-            <Text style={styles.header}>Care Team</Text>
-            <Text style={styles.subHeader}>{teamMembers.length} Members</Text>
+            {/* Changed from h1 to h2 */}
+            <CustomText size="h2" style={styles.header}>Care Team</CustomText>
+            <CustomText size="caption" style={styles.subHeader}>
+              {teamMembers.length} Member{teamMembers.length !== 1 ? 's' : ''}
+            </CustomText>
           </View>
           <TouchableOpacity style={styles.inviteButton} onPress={handleInvite}>
-            <Text style={styles.inviteText}>+  Invite</Text>
+            <CustomText size="body" style={styles.inviteText}>+  Invite</CustomText>
           </TouchableOpacity>
         </View>
         
@@ -154,7 +159,7 @@ export default function TeamScreen() {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Invite to Care Team</Text>
+                <CustomText size="h3" style={styles.modalTitle}>Invite to Care Team</CustomText>
                 <TouchableOpacity 
                   onPress={() => setInviteModalVisible(false)}
                   style={styles.closeButton}
@@ -163,12 +168,12 @@ export default function TeamScreen() {
                 </TouchableOpacity>
               </View>
               
-              <Text style={styles.modalDescription}>
+              <CustomText size="body" style={styles.modalDescription}>
                 Invite caregivers or family members to join {patientName}'s care team
-              </Text>
+              </CustomText>
               
               <TextInput
-                style={styles.emailInput}
+                style={[styles.emailInput, { fontSize: 16 }]} // Base font size, will scale
                 placeholder="Enter email address"
                 value={email}
                 onChangeText={setEmail}
@@ -185,7 +190,7 @@ export default function TeamScreen() {
                 {sendingInvite ? (
                   <ActivityIndicator size="small" color="#fff" />
                 ) : (
-                  <Text style={styles.sendButtonText}>Send Invite</Text>
+                  <CustomText size="body" style={styles.sendButtonText}>Send Invite</CustomText>
                 )}
               </TouchableOpacity>
             </View>
@@ -217,13 +222,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    fontSize: 20,
     fontWeight: 'bold',
     color: '#1a1a1a',
     marginBottom: 4,
   },
   subHeader: {
-    fontSize: 14,
     color: '#666',
   },
   listContent: { 
@@ -247,20 +250,17 @@ const styles = StyleSheet.create({
   },
   avatarText: {
     color: '#fff',
-    fontSize: 16,
     fontWeight: 'bold',
   },
   memberInfo: {
     flex: 1,
   },
   memberName: { 
-    fontSize: 15, 
     fontWeight: '600',
     color: '#1a1a1a',
     marginBottom: 4,
   },
   memberRole: { 
-    fontSize: 15, 
     color: '#666',
   },
   inviteButton: {
@@ -279,7 +279,6 @@ const styles = StyleSheet.create({
   inviteText: { 
     color: '#fff', 
     fontWeight: 'bold',
-    fontSize: 18,
   },
   modalOverlay: {
     flex: 1,
@@ -302,7 +301,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   modalTitle: {
-    fontSize: 18,
     fontWeight: 'bold',
     color: '#1a1a1a',
   },
@@ -310,7 +308,6 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   modalDescription: {
-    fontSize: 14,
     color: '#666',
     marginBottom: 20,
     lineHeight: 20,
@@ -320,7 +317,6 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderRadius: 8,
     padding: 12,
-    fontSize: 16,
     marginBottom: 20,
   },
   sendButton: {
@@ -335,6 +331,5 @@ const styles = StyleSheet.create({
   sendButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 16,
   },
 });

@@ -5,7 +5,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native'; // Added Text for placeholders
+import { View, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { FontSizeProvider } from './contexts/FontSizeContext';
 
 import HomeScreen from './screens/HomeScreen';
 import NewEntryScreen from './screens/NewEntryScreen';
@@ -15,6 +16,12 @@ import SignUpScreen from './screens/SignUpScreen';
 import CalendarScreen from './screens/CalendarScreen'; 
 import ProfileScreen from './screens/ProfilePage/ProfileScreen';
 import EditProfileScreen from './screens/ProfilePage/EditProfileScreen';
+import NotificationScreen from './screens/ProfilePage/NotificationsScreen';
+import QuickEntriesScreen from './screens/ProfilePage/QuickEntriesScreen';
+import AccessibilityScreen  from './screens/ProfilePage/AccessibilityScreen';
+import HelpAndSupportScreen from './screens/ProfilePage/HelpAndSupportScreen';
+import PrivacyAndDataScreen from './screens/ProfilePage/PrivacyAndDataScreen';
+import ChangePasswordScreen from './screens/ProfilePage/ChangePasswordScreen';
 import { supabase } from './config/supabase'; 
 
 const CustomAddButton = ({ children, onPress }) => (
@@ -125,42 +132,74 @@ export default function App() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <NavigationContainer>
-        <RootStack.Navigator>
-          {session ? (
-            <>
+    <FontSizeProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <NavigationContainer>
+          <RootStack.Navigator>
+            {session ? (
+              <>
+                <RootStack.Screen 
+                  name="Main" 
+                  component={MainTabs} 
+                  options={{ headerShown: false }} 
+                />
+                <RootStack.Screen 
+                  name="NewEntry" 
+                  component={NewEntryScreen} 
+                  options={{ presentation: 'modal', headerShown: false }} 
+                />
+                <RootStack.Screen 
+                  name="Profile" 
+                  component={ProfileScreen} 
+                  options={{ headerShown: false }} 
+                />
+                <RootStack.Screen 
+                  name="EditProfile" 
+                  component={EditProfileScreen} 
+                  options={{ headerShown: false }} 
+                />
+                <RootStack.Screen
+                  name="Notification"
+                  component={NotificationScreen}
+                  options={{headerShown: false}}
+                />
+                <RootStack.Screen
+                  name="QuickEntries"
+                  component={QuickEntriesScreen}
+                  options={{headerShown: false}}
+                />
+                <RootStack.Screen
+                  name="Accessibility"
+                  component={AccessibilityScreen}
+                  options={{headerShown: false}}
+                />
+                <RootStack.Screen
+                  name="HelpAndSupport"
+                  component={HelpAndSupportScreen}
+                  options={{headerShown: false}}
+                />
+                <RootStack.Screen
+                  name="PrivacyAndData"
+                  component={PrivacyAndDataScreen}
+                  options={{headerShown: false}}
+                />
+                <RootStack.Screen
+                  name="ChangePassword"
+                  component={ChangePasswordScreen}
+                  options={{headerShown: false}}
+                />
+              </>
+            ) : (
               <RootStack.Screen 
-                name="Main" 
-                component={MainTabs} 
+                name="Auth" 
+                component={SignUpScreen} 
                 options={{ headerShown: false }} 
               />
-              <RootStack.Screen 
-                name="NewEntry" 
-                component={NewEntryScreen} 
-                options={{ presentation: 'modal', headerShown: false }} 
-              />
-              <RootStack.Screen 
-                name="Profile" 
-                component={ProfileScreen} 
-                options={{ headerShown: false }} 
-              />
-              <RootStack.Screen 
-                name="EditProfile" 
-                component={EditProfileScreen} 
-                options={{ headerShown: false }} 
-              />
-            </>
-          ) : (
-            <RootStack.Screen 
-              name="Auth" 
-              component={SignUpScreen} 
-              options={{ headerShown: false }} 
-            />
-          )}
-        </RootStack.Navigator>
-      </NavigationContainer>
-    </GestureHandlerRootView>
+            )}
+          </RootStack.Navigator>
+        </NavigationContainer>
+      </GestureHandlerRootView>
+    </FontSizeProvider>
   );
 }
 

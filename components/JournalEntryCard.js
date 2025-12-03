@@ -1,18 +1,20 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, StyleSheet, Image } from 'react-native';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import CustomText from './CustomText';
 
 dayjs.extend(relativeTime);
 
 export const tagColors = {
-    Mood: '#42B826',
-    Sleep: '#957CF4',
-    Medication: '#1050DC',
-    Activity: '#85BEFF',
-    Meal: '#F3932C',
-    Behavior: '#DE3627',
-    Appointment: '#EEB62B'
+    Mood: '#DAEEAC',
+    Sleep: '#E2D2F3',
+    Medication: '#B4CBFF',
+    Activity: '#D4EFFF',
+    Meal: '#FBD9A6',
+    Behavior: '#FFC2C3',
+    Appointment: '#FFEAB1',
+    General:'#bfbfbfff'
 };
 
 export default function JournalEntryCard({ entry }) {
@@ -32,18 +34,20 @@ export default function JournalEntryCard({ entry }) {
             {/* ------------- HEADER (Avatar + Name + Time) ------------- */}
             <View style={styles.headerRow}>
                 <View style={styles.avatar}>
-                    <Text style={styles.avatarText}>
+                    <CustomText size={0.9} style={styles.avatarText}>
                         {getInitials(entry.author_name)}
-                    </Text>
+                    </CustomText>
                 </View>
 
                 <View style={{ flex: 1 }}>
-                    <Text style={styles.name}>{entry.author_name}</Text>
+                    <CustomText size="body" style={styles.name}>
+                        {entry.author_name}
+                    </CustomText>
                 </View>
 
-                <Text style={styles.time}>
+                <CustomText size="caption" style={styles.time}>
                     {timeAgo}
-                </Text>
+                </CustomText>
             </View>
 
             {/* ------------- ENTRY IMAGE (if exists) ------------- */}
@@ -59,9 +63,9 @@ export default function JournalEntryCard({ entry }) {
             )}
 
             {/* ------------- ENTRY TEXT ------------- */}
-            <Text style={[styles.details, styles.bodyIndent]}>
+            <CustomText size="body" style={[styles.details, styles.bodyIndent]}>
                 {entry.details}
-            </Text>
+            </CustomText>
 
             {/* ------------- TAGS ------------- */}
             <View style={[styles.tagsContainer, styles.bodyIndent]}>
@@ -73,7 +77,9 @@ export default function JournalEntryCard({ entry }) {
                             { backgroundColor: tagColors[tag] || tagColors.General },
                         ]}
                     >
-                        <Text style={styles.tagText}>{tag}</Text>
+                        <CustomText size="small" style={styles.tagText}>
+                            {tag}
+                        </CustomText>
                     </View>
                 ))}
             </View>
@@ -112,17 +118,14 @@ const styles = StyleSheet.create({
         marginRight: 8,
     },
     avatarText: {
-        fontSize: 14,
         fontWeight: "500",
         color: "#fff",
     },
     name: {
-        fontSize: 14,
         fontWeight: "600",
         color: "#000",
     },
     time: {
-        fontSize: 13,
         color: "#888",
         paddingRight: 8,
     },
@@ -142,7 +145,6 @@ const styles = StyleSheet.create({
 
     /* TEXT */
     details: {
-        fontSize: 15,
         color: '#333',
         lineHeight: 20,
         marginBottom: 10,
@@ -156,14 +158,13 @@ const styles = StyleSheet.create({
     },
     tag: {
         paddingHorizontal: 11,
-        paddingVertical:6,
+        paddingVertical: 6,
         borderRadius: 18,
         marginRight: 7,
         marginBottom: 7,
     },
     tagText: {
-        fontSize: 13,
-        color: "#fff",
+        color: "#000000ff",
         fontWeight: "500",
     },
 });

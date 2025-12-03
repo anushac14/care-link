@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Image, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Platform, Alert, LogBox } from 'react-native';
+import { Text, View, TouchableOpacity, TextInput, Image, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Platform, Alert, LogBox } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { decode } from 'base64-arraybuffer';
 import 'react-native-get-random-values';
 import { tagColors } from '../components/JournalEntryCard';
 import { supabase } from '../config/supabase';
+import CustomText from '../components/CustomText';
+import { useFontSize } from '../contexts/FontSizeContext';
 
 LogBox.ignoreLogs(['Non-serializable values were found in the navigation state']);
 
@@ -49,6 +51,7 @@ export default function NewEntryScreen({ navigation }) {
     const [image, setImage] = useState(null);
     const [patientData, setPatientData] = useState({ patientId: null, name: null });
     const [loading, setLoading] = useState(true);
+    const { getFontSize } = useFontSize();
 
     useEffect(() => {
         async function getPatientInfo() {
@@ -188,11 +191,15 @@ export default function NewEntryScreen({ navigation }) {
     const Header = () => (
         <View style={headerStyles.header}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Text style={headerStyles.headerButtonText}>Cancel</Text>
+                <Text style={headerStyles.headerButtonText}>
+                    Cancel
+                </Text>
             </TouchableOpacity>
-            <Text style={headerStyles.headerTitle}>New Entry</Text>
+            <Text style={headerStyles.headerTitle}>
+                New Entry
+            </Text>
             <TouchableOpacity onPress={saveEntry} disabled={loading}>
-                <Text style={[headerStyles.headerButtonText, headerStyles.saveText, loading && { opacity: 0.5 }]}>
+                <Text style={[headerStyles.headerButtonText, headerStyles.saveText, loading && { opacity: 0.5 }]}> {/* CHANGE BACK TO Text */}
                     {loading ? 'Saving...' : 'Save'}
                 </Text>
             </TouchableOpacity>
@@ -211,11 +218,13 @@ export default function NewEntryScreen({ navigation }) {
         <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
             <Header />
             <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-                <Text style={styles.patientInfo}>
+                <CustomText size="caption" style={styles.patientInfo}>
                     Posting to: {patientData.name || 'Unknown Patient'}'s Journal
-                </Text>
+                </CustomText>
 
-                <Text style={styles.sectionTitle}>Select Tags</Text>
+                <CustomText size="h4" style={styles.sectionTitle}>
+                    Select Tags
+                </CustomText>
                 <View style={styles.tagsContainer}>
                     {TAGS.map((tag) => {
                         const isSelected = selectedTags.includes(tag);
@@ -231,35 +240,44 @@ export default function NewEntryScreen({ navigation }) {
                                 style={[styles.tag, tagStyle]}
                                 onPress={() => toggleTag(tag)}
                             >
-                                <Text style={styles.tagText}>{tag}</Text>
+                                <CustomText size="small" style={styles.tagText}>
+                                    {tag}
+                                </CustomText>
                             </TouchableOpacity>
                         );
                     })}
                 </View>
 
-                <Text style={styles.sectionTitle}>Add Details</Text>
+                <CustomText size="h4" style={styles.sectionTitle}>
+                    Add Details
+                </CustomText>
                 <TextInput
-                    style={styles.textInput}
+                    style={[styles.textInput, { fontSize: getFontSize(1.0) }]}
                     placeholder="Add more details here..."
                     value={details}
                     onChangeText={setDetails}
                     multiline
                 />
 
-                <Text style={styles.sectionTitle}>Add Photo (Optional)</Text>
+                <CustomText size="h4" style={styles.sectionTitle}>
+                    Add Photo (Optional)
+                </CustomText>
                 <TouchableOpacity style={styles.imagePicker} onPress={pickImage} disabled={loading}>
                     {image ? (
                         <Image 
                             source={{ uri: image }} 
                             style={styles.image} 
-                            // Add an error handler for rendering issues
                             onError={(e) => console.error("DEBUG: Image Rendering Error:", e.nativeEvent.error)}
                         />
                     ) : (
                         <Text style={styles.plusSign}>+</Text>
                     )}
                 </TouchableOpacity>
-                {image && <Text style={{fontSize: 10, color: '#666', marginTop: 5}}>URI: {image.substring(0, 70)}...</Text>}
+                {image && (
+                    <CustomText size="tiny" style={{ color: '#666', marginTop: 5 }}>
+                        URI: {image.substring(0, 70)}...
+                    </CustomText>
+                )}
                 
                 <View style={{ height: 50 }} />
             </ScrollView>
@@ -291,16 +309,19 @@ const headerStyles = StyleSheet.create({
 });
 
 
+
 const styles = StyleSheet.create({
     container: { flex: 1, paddingHorizontal: 16, backgroundColor: '#fff' },
     patientInfo: {
-        fontSize: 14,
         color: '#666',
         textAlign: 'center',
         marginVertical: 10,
         fontWeight: '500',
     },
-    sectionTitle: { fontWeight: 'bold', marginVertical: 12, fontSize: 16 },
+    sectionTitle: { 
+        fontWeight: 'bold', 
+        marginVertical: 12,
+    },
     tagsContainer: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: 12 },
     tag: {
         paddingHorizontal: 10,
@@ -309,7 +330,9 @@ const styles = StyleSheet.create({
         marginRight: 6,
         marginBottom: 6,
     },
-    tagText: { fontSize: 13, color: '#333' },
+    tagText: { 
+        color: '#333',
+    },
     textInput: {
         minHeight: 120,
         borderWidth: 1,
@@ -317,7 +340,6 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         padding: 10,
         textAlignVertical: 'top',
-        fontSize: 16,
     },
     imagePicker: {
         width: 100,
@@ -330,8 +352,8 @@ const styles = StyleSheet.create({
         marginVertical: 8,
     },
     plusSign: {
-        fontSize: 30,
         color: '#ccc',
+        fontSize: 30,
     },
     image: { width: '100%', height: '100%', borderRadius: 10 },
 });

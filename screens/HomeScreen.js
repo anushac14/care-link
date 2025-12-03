@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, SectionList, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, SafeAreaView, SectionList, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { supabase } from '../config/supabase';
 import JournalEntryCard, { tagColors } from '../components/JournalEntryCard'; 
 import TopBarLayout from '../components/TopBarLayout';
 import dayjs from 'dayjs';
+import { useFontSize } from '../contexts/FontSizeContext';
+import CustomText from '../components/CustomText';
 
 export default function HomeScreen({ navigation }) {
     const [journalSections, setJournalSections] = useState([]);
@@ -146,10 +148,11 @@ export default function HomeScreen({ navigation }) {
     // Render each entry
     const renderEntry = ({ item }) => <JournalEntryCard entry={item} />;
 
-    // Render section header
     const renderSectionHeader = ({ section }) => (
         <View style={styles.sectionHeader}>
-            <Text style={styles.sectionHeaderText}>{section.title}</Text>
+            <CustomText size="h2" style={styles.sectionHeaderText}>
+                {section.title}
+            </CustomText>
         </View>
     );
 
@@ -157,7 +160,9 @@ export default function HomeScreen({ navigation }) {
         return (
             <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#007bff" />
-                <Text style={{ marginTop: 10 }}>Loading {patientName}'s Journal...</Text>
+                <CustomText size="body" style={styles.loadingText}>
+                    Loading {patientName}'s Journal...
+                </CustomText>
             </View>
         );
     }
@@ -173,8 +178,12 @@ export default function HomeScreen({ navigation }) {
                 stickySectionHeadersEnabled={false}
                 ListEmptyComponent={() => (
                     <View style={styles.emptyContainer}>
-                        <Text style={styles.emptyText}>No entries yet.</Text>
-                        <Text style={styles.emptySubText}>Tap the '+' to add the first entry.</Text>
+                        <CustomText size="h3" style={styles.emptyText}>
+                            No entries yet.
+                        </CustomText>
+                        <CustomText size="body" style={styles.emptySubText}>
+                            Tap the '+' to add the first entry.
+                        </CustomText>
                     </View>
                 )}
             />
@@ -196,18 +205,20 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    loadingText: {
+        marginTop: 10,
+        color: '#38496B',
+    },
     emptyContainer: {
         flex: 1,
         alignItems: 'center',
         marginTop: 50,
     },
     emptyText: {
-        fontSize: 18,
         color: '#666',
         fontWeight: 'bold',
     },
     emptySubText: {
-        fontSize: 14,
         color: '#999',
         marginTop: 5,
     },
@@ -219,7 +230,6 @@ const styles = StyleSheet.create({
         borderBottomColor: '#eee',
     },
     sectionHeaderText: {
-        fontSize: 20,
         fontWeight: '700',
         color: '#38496B',
         letterSpacing: 0.5,

@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import dayjs from 'dayjs'; 
 import { supabase } from '../config/supabase';
 import TopBarLayout from '../components/TopBarLayout';
+import CustomText from '../components/CustomText';
 
 const tagColors = {
     Mood: '#42B826',
@@ -144,16 +145,18 @@ export default function CalendarScreen({ navigation }) {
                 {/* HEADER (Avatar + Name + Time) */}
                 <View style={calendarStyles.headerRow}>
                     <View style={calendarStyles.avatar}>
-                        <Text style={calendarStyles.avatarText}>
+                        <CustomText size={1.1} style={calendarStyles.avatarText}>
                             {getInitials(authorName)}
-                        </Text>
+                        </CustomText>
                     </View>
                     <View style={{ flex: 1 }}>
-                        <Text style={calendarStyles.name}>{authorName}</Text>
+                        <CustomText size="body" style={calendarStyles.name}>
+                            {authorName}
+                        </CustomText>
                     </View>
-                    <Text style={calendarStyles.time}>
-                        {dayjs(entry.date).format('h:mm a')} {/* Actual clock time */}
-                    </Text>
+                    <CustomText size="caption" style={calendarStyles.time}>
+                        {dayjs(entry.date).format('h:mm a')}
+                    </CustomText>
                 </View>
 
                 {/* ENTRY IMAGE (if exists) */}
@@ -169,9 +172,9 @@ export default function CalendarScreen({ navigation }) {
                 )}
 
                 {/* ENTRY TEXT */}
-                <Text style={[calendarStyles.details, calendarStyles.bodyIndent]}>
+                <CustomText size="body" style={[calendarStyles.details, calendarStyles.bodyIndent]}>
                     {entry.details}
-                </Text>
+                </CustomText>
 
                 {/* TAGS */}
                 <View style={[calendarStyles.tagsContainer, calendarStyles.bodyIndent]}>
@@ -183,7 +186,9 @@ export default function CalendarScreen({ navigation }) {
                                 { backgroundColor: tagColors[tag] || '#eee' },
                             ]}
                         >
-                            <Text style={calendarStyles.tagText}>{tag}</Text>
+                            <CustomText size="small" style={calendarStyles.tagText}>
+                                {tag}
+                            </CustomText>
                         </View>
                     ))}
                 </View>
@@ -194,7 +199,6 @@ export default function CalendarScreen({ navigation }) {
     return (
         <TopBarLayout>
             <ScrollView style={calendarStyles.container}>
-                {/* Month Navigation */}
                 <View style={calendarStyles.monthNavigator}>
                     <TouchableOpacity onPress={() => changeMonth('back')} style={calendarStyles.navButton}>
                         <Ionicons name="chevron-back" size={24} color="#333" />
@@ -205,14 +209,12 @@ export default function CalendarScreen({ navigation }) {
                     </TouchableOpacity>
                 </View>
                 
-                {/* Calendar Grid Headers */}
                 <View style={calendarStyles.calendarHeaders}>
                     {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map(day => (
                         <Text key={day} style={calendarStyles.dayHeader}>{day}</Text>
                     ))}
                 </View>
 
-                {/* Calendar Grid Dates */}
                 <View style={calendarStyles.calendarGrid}>
                     {days.map((day, index) => {
                         const dateString = day.format('YYYY-MM-DD');
@@ -241,17 +243,18 @@ export default function CalendarScreen({ navigation }) {
                         );
                     })}
                 </View>
-                
-                {/* Entry List Header */}
-                <Text style={calendarStyles.dayHeaderTitle}>
+                \
+                <CustomText size="h2" style={calendarStyles.dayHeaderTitle}>
                     {dayjs(selectedDate).format('dddd, MMMM D')}
-                </Text>
+                </CustomText>
 
                 {/* Dynamic Entry List */}
                 {loading && <ActivityIndicator size="small" color="#007bff" style={{ marginVertical: 20 }} />}
                 
                 {!loading && dayEntries && dayEntries.length === 0 && (
-                    <Text style={calendarStyles.emptyState}>No entries found for this day.</Text>
+                    <CustomText size="body" style={calendarStyles.emptyState}>
+                        No entries found for this day.
+                    </CustomText>
                 )}
                 
                 {!loading && dayEntries && dayEntries.length > 0 && dayEntries.map(renderEntry)}
@@ -344,7 +347,6 @@ const calendarStyles = StyleSheet.create({
     
     // Entry List Header
     dayHeaderTitle: {
-        fontSize: 18,
         fontWeight: '700',
         color: '#38496B',
         letterSpacing: 0.5,
@@ -381,17 +383,14 @@ const calendarStyles = StyleSheet.create({
         marginRight: 10,
     },
     avatarText: {
-        fontSize: 16,
         fontWeight: "600",
         color: "#fff",
     },
     name: {
-        fontSize: 16,
         fontWeight: "600",
         color: "#000",
     },
     time: {
-        fontSize: 13,
         color: "#888",
     },
     
@@ -408,15 +407,14 @@ const calendarStyles = StyleSheet.create({
         paddingLeft: 42,
     },
     
-    /* TEXT */
+    /* TEXT - SCALE */
     details: {
-        fontSize: 15,
         color: '#333',
         lineHeight: 20,
         marginBottom: 10,
     },
     
-    /* TAGS */
+    /* TAGS - SCALE */
     tagsContainer: {
         flexDirection: "row",
         flexWrap: "wrap",
@@ -430,7 +428,6 @@ const calendarStyles = StyleSheet.create({
         marginBottom: 7,
     },
     tagText: {
-        fontSize: 12.5,
         color: "#fff",
         fontWeight: "500",
     },
@@ -439,6 +436,5 @@ const calendarStyles = StyleSheet.create({
         textAlign: 'center',
         color: '#666',
         marginTop: 20,
-        fontSize: 16,
     }
 });

@@ -72,7 +72,6 @@ export default function ProfileScreen({ navigation }) {
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#38496B" />
-          <Text style={{ marginTop: 10, color: '#38496B' }}>Loading profile...</Text>
         </View>
       </SafeAreaView>
     );
@@ -121,18 +120,33 @@ export default function ProfileScreen({ navigation }) {
             <Text style={styles.sectionTitle}>App Settings</Text>
             <View style={styles.settingGroup}>
               <View style={styles.settingsList}>
-                <View style={styles.settingItem}>
-                  <Text style={styles.settingLabel}>Quick Entries</Text>
+                <TouchableOpacity 
+                  style={styles.settingItem}
+                  onPress={() => navigation.navigate('QuickEntries')}
+                >
+                  <Text style={styles.settingLabel}>
+                    Quick Entries
+                  </Text>
                   <Ionicons name="chevron-forward" size={20} color="#999" />
-                </View>
-                <View style={styles.settingItem}>
-                  <Text style={styles.settingLabel}>Notifications</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.settingItem}
+                  onPress={() => navigation.navigate('Notification')}
+                >
+                  <Text style={styles.settingLabel}>
+                    Notifications
+                  </Text>
                   <Ionicons name="chevron-forward" size={20} color="#999" />
-                </View>
-                <View style={styles.settingItem}>
-                  <Text style={styles.settingLabel}>Accessibility</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.settingItem}
+                  onPress={() => navigation.navigate('Accessibility')}
+                >
+                  <Text style={styles.settingLabel}>
+                    Accessibility
+                  </Text>
                   <Ionicons name="chevron-forward" size={20} color="#999" />
-                </View>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
@@ -142,18 +156,33 @@ export default function ProfileScreen({ navigation }) {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Account & Privacy</Text>
             <View style={styles.settingsList}>
-              <View style={styles.settingItem}>
-                <Text style={styles.settingLabel}>Help and support</Text>
+              <TouchableOpacity 
+                style={styles.settingItem}
+                onPress={() => navigation.navigate('HelpAndSupport')}
+              >
+                <Text style={styles.settingLabel}>
+                  Help and support
+                </Text>
                 <Ionicons name="chevron-forward" size={20} color="#999" />
-              </View>
-              <View style={styles.settingItem}>
-                <Text style={styles.settingLabel}>Privacy and data</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.settingItem}
+                onPress={() => navigation.navigate('PrivacyAndData')}
+              >
+                <Text style={styles.settingLabel}>
+                  Privacy and data
+                </Text>
                 <Ionicons name="chevron-forward" size={20} color="#999" />
-              </View>
-              <View style={styles.settingItem}>
-                <Text style={styles.settingLabel}>Change password</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.settingItem}
+                onPress={() => navigation.navigate('ChangePassword')}
+              >
+                <Text style={styles.settingLabel}>
+                  Change password
+                </Text>
                 <Ionicons name="chevron-forward" size={20} color="#999" />
-              </View>
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -161,7 +190,9 @@ export default function ProfileScreen({ navigation }) {
 
           <View style={styles.section}>
             <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
-              <Text style={styles.logoutText}>Log out</Text>
+              <Text style={styles.logoutText}>
+                Log out
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -199,6 +230,11 @@ const styles = StyleSheet.create({
   scrollContent: {
     flex: 1,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   profileSection: {
     paddingHorizontal: 20,
     paddingVertical: 16,
@@ -208,7 +244,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   sectionTitle: {
-    fontSize: 15,
+    fontSize: 16,
+    fontWeight: '600',
     color: '#38496B',
     marginBottom: 12,
   },

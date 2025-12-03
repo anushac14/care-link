@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Alert, LogBox, Platform } from 'react-native';
+import { View, TouchableOpacity, TextInput, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Alert, LogBox, Platform } from 'react-native';
 import { supabase } from '../config/supabase';
 import TopBarLayout from '../components/TopBarLayout';
+import CustomText from '../components/CustomText';
 import Constants from "expo-constants";
 const GEMINI_API_KEY = Constants.expoConfig.extra.GEMINI_API_KEY;
 
@@ -180,17 +181,21 @@ export default function ReportScreen({ navigation }) {
     return (
         <TopBarLayout>
             <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-                <Text style={styles.patientInfo}>
+                <CustomText size="caption" style={styles.patientInfo}>
                     Generating Report for: {patientData.name || 'Unknown Patient'}
-                </Text>
+                </CustomText>
 
-                <Text style={styles.sectionTitle}>Select Date Period (YYYY-MM-DD)</Text>
+                <CustomText size="h4" style={styles.sectionTitle}>
+                    Select Date Period (YYYY-MM-DD)
+                </CustomText>
                 
                 <View style={styles.dateRow}>
                     <View style={styles.dateInputContainer}>
-                        <Text style={styles.dateLabel}>Start Date</Text>
+                        <CustomText size="body" style={styles.dateLabel}>
+                            Start Date
+                        </CustomText>
                         <TextInput
-                            style={styles.textInput}
+                            style={[styles.textInput, { fontSize: 16 }]}
                             placeholder="e.g. 2024-01-01"
                             value={startDate}
                             onChangeText={setStartDate}
@@ -198,9 +203,11 @@ export default function ReportScreen({ navigation }) {
                         />
                     </View>
                     <View style={styles.dateInputContainer}>
-                        <Text style={styles.dateLabel}>End Date</Text>
+                        <CustomText size="body" style={styles.dateLabel}>
+                            End Date
+                        </CustomText>
                         <TextInput
-                            style={styles.textInput}
+                            style={[styles.textInput, { fontSize: 16 }]}
                             placeholder="e.g. 2024-01-31"
                             value={endDate}
                             onChangeText={setEndDate}
@@ -214,31 +221,39 @@ export default function ReportScreen({ navigation }) {
                     onPress={generateSummary}
                     disabled={reportLoading}
                 >
-                    <Text style={styles.generateButtonText}>
+                    <CustomText size="h4" style={styles.generateButtonText}>
                         {reportLoading ? 'Generating...' : 'Generate Summary'}
-                    </Text>
+                    </CustomText>
                 </TouchableOpacity>
 
                 {/* --- Summary Output Area --- */}
                 {reportLoading && (
                     <View style={styles.summaryContainer}>
                         <ActivityIndicator size="small" color="#007bff" />
-                        <Text style={styles.loadingText}>Analyzing entries with Gemini...</Text>
+                        <CustomText size="caption" style={styles.loadingText}>
+                            Analyzing entries with Gemini...
+                        </CustomText>
                     </View>
                 )}
 
                 {summary && !reportLoading && (
                     <View style={styles.summaryContainer}>
-                        <Text style={styles.summaryTitle}>Report Summary ({startDate} to {endDate})</Text>
-                        <Text style={styles.summaryText}>{summary.text}</Text>
+                        <CustomText size="h3" style={styles.summaryTitle}>
+                            Report Summary ({startDate} to {endDate})
+                        </CustomText>
+                        <CustomText size="body" style={styles.summaryText}>
+                            {summary.text}
+                        </CustomText>
 
                         {summary.sources && summary.sources.length > 0 && (
                             <View style={styles.sourcesContainer}>
-                                <Text style={styles.sourcesTitle}>Grounded Sources (via Google Search):</Text>
+                                <CustomText size="small" style={styles.sourcesTitle}>
+                                    Grounded Sources (via Google Search):
+                                </CustomText>
                                 {summary.sources.map((source, index) => (
-                                    <Text key={index} style={styles.sourceItem}>
+                                    <CustomText key={index} size="tiny" style={styles.sourceItem}>
                                         • {source.title || source.uri}
-                                    </Text>
+                                    </CustomText>
                                 ))}
                             </View>
                         )}
@@ -255,13 +270,15 @@ export default function ReportScreen({ navigation }) {
 const styles = StyleSheet.create({
     container: { flex: 1, paddingHorizontal: 16, backgroundColor: '#fff' },
     patientInfo: {
-        fontSize: 14,
         color: '#666',
         textAlign: 'center',
         marginVertical: 10,
         fontWeight: '500',
     },
-    sectionTitle: { fontWeight: 'bold', marginVertical: 12, fontSize: 16 },
+    sectionTitle: { 
+        fontWeight: 'bold', 
+        marginVertical: 12,
+    },
     dateRow: { 
         flexDirection: 'row', 
         justifyContent: 'space-between', 
@@ -272,7 +289,6 @@ const styles = StyleSheet.create({
         flex: 1, 
     },
     dateLabel: {
-        fontSize: 14,
         color: '#333',
         marginBottom: 4,
         fontWeight: '500',
@@ -283,7 +299,6 @@ const styles = StyleSheet.create({
         borderColor: '#ddd',
         borderRadius: 8,
         paddingHorizontal: 10,
-        fontSize: 16,
     },
     generateButton: {
         backgroundColor: '#38496B',
@@ -300,7 +315,6 @@ const styles = StyleSheet.create({
     generateButtonText: {
         color: '#fff',
         fontWeight: 'bold',
-        fontSize: 18,
     },
     // Summary Styles
     summaryContainer: {
@@ -311,20 +325,17 @@ const styles = StyleSheet.create({
         borderColor: '#eee',
     },
     summaryTitle: {
-        fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 10,
         color: '#333',
     },
     summaryText: {
-        fontSize: 16,
         lineHeight: 24,
         color: '#444',
         marginBottom: 15,
     },
     loadingText: {
         marginTop: 8,
-        fontSize: 14,
         color: '#666',
     },
     sourcesContainer: {
@@ -333,13 +344,11 @@ const styles = StyleSheet.create({
         borderTopColor: '#e0e0e0',
     },
     sourcesTitle: {
-        fontSize: 13,
         fontWeight: '600',
         color: '#666',
         marginBottom: 5,
     },
     sourceItem: {
-        fontSize: 12,
         color: '#38496B',
         lineHeight: 18,
     }
