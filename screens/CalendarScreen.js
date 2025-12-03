@@ -8,7 +8,7 @@ import TopBarLayout from '../components/TopBarLayout';
 const tagColors = {
     Mood: '#42B826',
     Sleep: '#957CF4',
-    Medication: '#416ECF',
+    Medication: '#1050DC',
     Activity: '#85BEFF',
     Meal: '#F3932C',
     Behavior: '#DE3627',
