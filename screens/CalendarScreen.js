@@ -243,7 +243,6 @@ export default function CalendarScreen({ navigation }) {
                         );
                     })}
                 </View>
-                \
                 <CustomText size="h2" style={calendarStyles.dayHeaderTitle}>
                     {dayjs(selectedDate).format('dddd, MMMM D')}
                 </CustomText>

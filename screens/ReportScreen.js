@@ -4,6 +4,7 @@ import { supabase } from '../config/supabase';
 import TopBarLayout from '../components/TopBarLayout';
 import CustomText from '../components/CustomText';
 import Constants from "expo-constants";
+import Markdown from 'react-native-markdown-display';
 const GEMINI_API_KEY = Constants.expoConfig.extra.GEMINI_API_KEY;
 
 const callApiWithBackoff = async (apiCall, maxRetries = 3) => {
@@ -181,9 +182,6 @@ export default function ReportScreen({ navigation }) {
     return (
         <TopBarLayout>
             <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-                <CustomText size="caption" style={styles.patientInfo}>
-                    Generating Report for: {patientData.name || 'Unknown Patient'}
-                </CustomText>
 
                 <CustomText size="h4" style={styles.sectionTitle}>
                     Select Date Period (YYYY-MM-DD)
@@ -241,9 +239,10 @@ export default function ReportScreen({ navigation }) {
                         <CustomText size="h3" style={styles.summaryTitle}>
                             Report Summary ({startDate} to {endDate})
                         </CustomText>
-                        <CustomText size="body" style={styles.summaryText}>
+
+                        <Markdown style={markdownStyles}>
                             {summary.text}
-                        </CustomText>
+                        </Markdown>
 
                         {summary.sources && summary.sources.length > 0 && (
                             <View style={styles.sourcesContainer}>
@@ -266,6 +265,33 @@ export default function ReportScreen({ navigation }) {
     );
 }
 
+// Markdown styles
+const markdownStyles = {
+  body: {
+    fontSize: 16,
+    lineHeight: 24,
+    color: '#444',
+  },
+  strong: {
+    fontWeight: 'bold',
+  },
+  em: {
+    fontStyle: 'italic',
+  },
+  bullet_list: {
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  list_item: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 4,
+  },
+  paragraph: {
+    marginTop: 6,
+    marginBottom: 6,
+  },
+};
 
 const styles = StyleSheet.create({
     container: { flex: 1, paddingHorizontal: 16, backgroundColor: '#fff' },

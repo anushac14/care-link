@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Modal, TextInput } from 'react-native';
+import { View, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Modal, TextInput, Clipboard } from 'react-native';
 import { supabase } from '../config/supabase';
 import TopBarLayout from '../components/TopBarLayout';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,9 +9,8 @@ export default function TeamScreen() {
   const [teamMembers, setTeamMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [patientName, setPatientName] = useState('');
-  const [inviteModalVisible, setInviteModalVisible] = useState(false);
-  const [email, setEmail] = useState('');
-  const [sendingInvite, setSendingInvite] = useState(false);
+  const [groupCode, setGroupCode] = useState('');
+  const [showCopied, setShowCopied] = useState(false);
 
   useEffect(() => {
     fetchTeamMembers();
@@ -39,15 +38,16 @@ export default function TeamScreen() {
 
         const patientId = userData.patient_id;
 
-        // Fetch patient name for the top bar
+        // Fetch patient data
         const { data: patientData, error: patientError } = await supabase
           .from('patients')
-          .select('name')
+          .select('name, group_code')
           .eq('id', patientId)
           .single();
 
         if (!patientError && patientData) {
           setPatientName(patientData.name);
+          setGroupCode(patientData.group_code || 'No code set');
         }
 
         const { data, error } = await supabase
@@ -65,37 +65,19 @@ export default function TeamScreen() {
     }
   };
 
-  const handleInvite = () => {
-    setInviteModalVisible(true);
-  };
-
-  const sendInvite = async () => {
-    if (!email.trim()) {
-      Alert.alert('Error', 'Please enter an email address');
-      return;
-    }
-
-    setSendingInvite(true);
+  const copyToClipboard = () => {
+    if (!groupCode || groupCode === 'No code set') return;
+    
     try {
-      // Here you would integrate with your email service
-      // For now, we'll simulate the process
+      Clipboard.setString(groupCode); // No await needed
+      setShowCopied(true);
       
-      console.log('Sending invite to:', email);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      Alert.alert(
-        'Invite Sent!',
-        `An invitation has been sent to ${email}. They'll be able to join the care team once they accept.`,
-        [{ text: 'OK', onPress: () => setInviteModalVisible(false) }]
-      );
-      
-      setEmail('');
+      // Hide the "Copied!" message after 2 seconds
+      setTimeout(() => {
+        setShowCopied(false);
+      }, 2000);
     } catch (error) {
-      Alert.alert('Error', 'Failed to send invite. Please try again.');
-    } finally {
-      setSendingInvite(false);
+      Alert.alert("Error", "Failed to copy code to clipboard");
     }
   };
 
@@ -130,15 +112,46 @@ export default function TeamScreen() {
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <View style={styles.headerTextContainer}>
-            {/* Changed from h1 to h2 */}
             <CustomText size="h2" style={styles.header}>Care Team</CustomText>
             <CustomText size="caption" style={styles.subHeader}>
               {teamMembers.length} Member{teamMembers.length !== 1 ? 's' : ''}
             </CustomText>
           </View>
-          <TouchableOpacity style={styles.inviteButton} onPress={handleInvite}>
-            <CustomText size="body" style={styles.inviteText}>+  Invite</CustomText>
-          </TouchableOpacity>
+          
+          {/* Group Code with positioning wrapper */}
+          <View style={styles.groupCodeWrapper}>
+            <TouchableOpacity 
+              style={styles.groupCodeContainer}
+              onPress={copyToClipboard}
+              disabled={!groupCode || groupCode === 'No code set'}
+            >
+              <View style={styles.groupCodeContent}>
+                <CustomText size="body" style={styles.groupCodeLabel}>
+                  Group Code:
+                </CustomText>
+                <View style={styles.codeRow}>
+                  <CustomText size="h3" style={styles.groupCodeText}>
+                    {groupCode}
+                  </CustomText>
+                  <Ionicons 
+                    name="copy-outline" 
+                    size={18} 
+                    color="#38496B" 
+                    style={styles.copyIcon}
+                  />
+                </View>
+              </View>
+            </TouchableOpacity>
+            
+            {/* "Copied!" message positioned relative to the wrapper */}
+            {showCopied && (
+              <View style={styles.copiedContainer}>
+                <CustomText size="small" style={styles.copiedText}>
+                  Copied!
+                </CustomText>
+              </View>
+            )}
+          </View>
         </View>
         
         <FlatList
@@ -148,54 +161,6 @@ export default function TeamScreen() {
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
         />
-
-        {/* Invite Modal */}
-        <Modal
-          visible={inviteModalVisible}
-          animationType="none"
-          transparent={true}
-          onRequestClose={() => setInviteModalVisible(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalHeader}>
-                <CustomText size="h3" style={styles.modalTitle}>Invite to Care Team</CustomText>
-                <TouchableOpacity 
-                  onPress={() => setInviteModalVisible(false)}
-                  style={styles.closeButton}
-                >
-                  <Ionicons name="close" size={24} color="#666" />
-                </TouchableOpacity>
-              </View>
-              
-              <CustomText size="body" style={styles.modalDescription}>
-                Invite caregivers or family members to join {patientName}'s care team
-              </CustomText>
-              
-              <TextInput
-                style={[styles.emailInput, { fontSize: 16 }]} // Base font size, will scale
-                placeholder="Enter email address"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-              
-              <TouchableOpacity 
-                style={[styles.sendButton, sendingInvite && styles.sendButtonDisabled]}
-                onPress={sendInvite}
-                disabled={sendingInvite}
-              >
-                {sendingInvite ? (
-                  <ActivityIndicator size="small" color="#fff" />
-                ) : (
-                  <CustomText size="body" style={styles.sendButtonText}>Send Invite</CustomText>
-                )}
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
       </View>
     </TopBarLayout>
   );
@@ -223,11 +188,11 @@ const styles = StyleSheet.create({
   },
   header: {
     fontWeight: 'bold',
-    color: '#1a1a1a',
+    color: '#38496B',
     marginBottom: 4,
   },
   subHeader: {
-    color: '#666',
+    color: '#38496B',
   },
   listContent: { 
     paddingBottom: 20,
@@ -263,73 +228,44 @@ const styles = StyleSheet.create({
   memberRole: { 
     color: '#666',
   },
-  inviteButton: {
-    backgroundColor: '#38496B',
-    paddingHorizontal: 18, 
-    paddingVertical: 11,  
-    borderRadius: 8, 
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+  groupCodeWrapper: {
+    position: 'relative',
     marginLeft: 16,
     marginTop: 4,
   },
-  inviteText: { 
-    color: '#fff', 
-    fontWeight: 'bold',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
+  groupCodeContent: {
     alignItems: 'center',
-    padding: 20,
   },
-  modalContent: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    width: '100%',
-    maxWidth: 400,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  modalTitle: {
-    fontWeight: 'bold',
-    color: '#1a1a1a',
-  },
-  closeButton: {
-    padding: 5,
-  },
-  modalDescription: {
+  groupCodeLabel: {
     color: '#666',
-    marginBottom: 20,
-    lineHeight: 20,
+    marginBottom: 4,
+    fontWeight: '500',
   },
-  emailInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 20,
-  },
-  sendButton: {
-    backgroundColor: '#38496B',
-    padding: 14,
-    borderRadius: 8,
+  codeRow: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  sendButtonDisabled: {
-    opacity: 0.6,
-  },
-  sendButtonText: {
-    color: '#fff',
+  groupCodeText: {
+    color: '#38496B',
     fontWeight: 'bold',
+    marginRight: 8,
+  },
+  copyIcon: {
+    opacity: 0.7,
+  },
+  copiedContainer: {
+    position: 'absolute',
+    top: '100%', 
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    marginTop: 5,
+  },
+  copiedText: {
+    color: '#42B826',
+    fontWeight: '600',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
   },
 });
