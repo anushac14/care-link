@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, TouchableOpacity, TextInput, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Alert, LogBox, Platform } from 'react-native';
+import { View, TouchableOpacity, TextInput, StyleSheet, ScrollView, ActivityIndicator, Alert, LogBox, Platform } from 'react-native';
 import { supabase } from '../config/supabase';
 import TopBarLayout from '../components/TopBarLayout';
 import CustomText from '../components/CustomText';

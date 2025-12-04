@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity, TextInput, Image, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Platform, Alert, LogBox } from 'react-native';
+import { Text, View, TouchableOpacity, TextInput, Image, StyleSheet, ScrollView, ActivityIndicator, Platform, Alert, LogBox } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { decode } from 'base64-arraybuffer';

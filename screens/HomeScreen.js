@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, SafeAreaView, SectionList, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, SectionList, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { supabase } from '../config/supabase';
 import JournalEntryCard, { tagColors } from '../components/JournalEntryCard'; 
 import TopBarLayout from '../components/TopBarLayout';

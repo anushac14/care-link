@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Modal, TextInput, Clipboard } from 'react-native';
+import { View, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { supabase } from '../config/supabase';
 import TopBarLayout from '../components/TopBarLayout';
 import { Ionicons } from '@expo/vector-icons';
+import * as Clipboard from 'expo-clipboard';
 import CustomText from '../components/CustomText';
 
 export default function TeamScreen() {
@@ -69,7 +70,7 @@ export default function TeamScreen() {
     if (!groupCode || groupCode === 'No code set') return;
     
     try {
-      Clipboard.setString(groupCode); // No await needed
+      Clipboard.setStringAsync(groupCode);
       setShowCopied(true);
       
       // Hide the "Copied!" message after 2 seconds
