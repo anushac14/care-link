@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Switch } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../config/supabase';
-import CustomText from '../../components/CustomText';
 
 export default function NotificationsScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
@@ -35,88 +34,88 @@ export default function NotificationsScreen({ navigation }) {
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <Ionicons name="chevron-back" size={24} color="#38496B" />
           </TouchableOpacity>
-          <CustomText size="h3" style={styles.headerTitle}>Notifications</CustomText>
+          <Text style={styles.headerTitle}>Notifications</Text>
           <View style={{ width: 24 }} />
         </View>
 
         <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={styles.content}>
-            <CustomText size="caption" style={styles.sectionTitle}>
+          <View style={styles.content}>
+            <Text style={styles.sectionTitle}>
               Notify me only for specific entries
-            </CustomText>
+            </Text>
             
             <View style={styles.notificationList}>
-            {/* Mood toggle */}
-            <View style={styles.notificationItem}>
-                <CustomText size="h4" style={styles.notificationLabel}>Mood</CustomText>
+              {/* Mood toggle */}
+              <View style={styles.notificationItem}>
+                <Text style={styles.notificationLabel}>Mood</Text>
                 <Switch
-                value={moodNotifications}
-                onValueChange={setMoodNotifications}
-                trackColor={{ false: '#767577', true: '#38496B' }}
+                  value={moodNotifications}
+                  onValueChange={setMoodNotifications}
+                  trackColor={{ false: '#767577', true: '#38496B' }}
                 />
-            </View>
-            
-            {/* Sleep toggle */}
-            <View style={styles.notificationItem}>
-                <CustomText size="h4" style={styles.notificationLabel}>Sleep</CustomText>
+              </View>
+              
+              {/* Sleep toggle */}
+              <View style={styles.notificationItem}>
+                <Text style={styles.notificationLabel}>Sleep</Text>
                 <Switch
-                value={sleepNotifications}
-                onValueChange={setSleepNotifications}
-                trackColor={{ false: '#767577', true: '#38496B' }}
+                  value={sleepNotifications}
+                  onValueChange={setSleepNotifications}
+                  trackColor={{ false: '#767577', true: '#38496B' }}
                 />
-            </View>
-            
-            {/* Medication toggle */}
-            <View style={styles.notificationItem}>
-                <CustomText size="h4" style={styles.notificationLabel}>Medication</CustomText>
+              </View>
+              
+              {/* Medication toggle */}
+              <View style={styles.notificationItem}>
+                <Text style={styles.notificationLabel}>Medication</Text>
                 <Switch
-                value={medicationNotifications}
-                onValueChange={setMedicationNotifications}
-                trackColor={{ false: '#767577', true: '#38496B' }}
+                  value={medicationNotifications}
+                  onValueChange={setMedicationNotifications}
+                  trackColor={{ false: '#767577', true: '#38496B' }}
                 />
-            </View>
-            
-            {/* Activity toggle */}
-            <View style={styles.notificationItem}>
-                <CustomText size="h4" style={styles.notificationLabel}>Activity</CustomText>
+              </View>
+              
+              {/* Activity toggle */}
+              <View style={styles.notificationItem}>
+                <Text style={styles.notificationLabel}>Activity</Text>
                 <Switch
-                value={activityNotifications}
-                onValueChange={setActivityNotifications}
-                trackColor={{ false: '#767577', true: '#38496B' }}
+                  value={activityNotifications}
+                  onValueChange={setActivityNotifications}
+                  trackColor={{ false: '#767577', true: '#38496B' }}
                 />
-            </View>
-            
-            {/* Meal toggle */}
-            <View style={styles.notificationItem}>
-                <CustomText size="h4" style={styles.notificationLabel}>Meal</CustomText>
+              </View>
+              
+              {/* Meal toggle */}
+              <View style={styles.notificationItem}>
+                <Text style={styles.notificationLabel}>Meal</Text>
                 <Switch
-                value={mealNotifications}
-                onValueChange={setMealNotifications}
-                trackColor={{ false: '#767577', true: '#38496B' }}
+                  value={mealNotifications}
+                  onValueChange={setMealNotifications}
+                  trackColor={{ false: '#767577', true: '#38496B' }}
                 />
-            </View>
-            
-            {/* Behavior toggle */}
-            <View style={styles.notificationItem}>
-                <CustomText size="h4" style={styles.notificationLabel}>Behavior</CustomText>
+              </View>
+              
+              {/* Behavior toggle */}
+              <View style={styles.notificationItem}>
+                <Text style={styles.notificationLabel}>Behavior</Text>
                 <Switch
-                value={behaviorNotifications}
-                onValueChange={setBehaviorNotifications}
-                trackColor={{ false: '#767577', true: '#38496B' }}
+                  value={behaviorNotifications}
+                  onValueChange={setBehaviorNotifications}
+                  trackColor={{ false: '#767577', true: '#38496B' }}
                 />
-            </View>
-            
-            {/* Appointment toggle */}
-            <View style={styles.notificationItem}>
-                <CustomText size="h4" style={styles.notificationLabel}>Appointment</CustomText>
+              </View>
+              
+              {/* Appointment toggle */}
+              <View style={styles.notificationItem}>
+                <Text style={styles.notificationLabel}>Appointment</Text>
                 <Switch
-                value={appointmentNotifications}
-                onValueChange={setAppointmentNotifications}
-                trackColor={{ false: '#767577', true: '#38496B' }}
+                  value={appointmentNotifications}
+                  onValueChange={setAppointmentNotifications}
+                  trackColor={{ false: '#767577', true: '#38496B' }}
                 />
+              </View>
             </View>
-            </View>
-        </View>
+          </View>
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -143,6 +142,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   headerTitle: {
+    fontSize: 17,
     fontWeight: '600',
     color: '#38496B',
   },
@@ -158,6 +158,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   sectionTitle: {
+    fontSize: 16,
     color: '#38496B',
     marginBottom: 20,
   },
@@ -174,6 +175,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#f0f0f0',
   },
   notificationLabel: {
+    fontSize: 16,
     color: '#38496B',
     fontWeight: '500',
   },
