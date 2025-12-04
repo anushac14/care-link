@@ -210,7 +210,7 @@ export default function SignUpScreen({ navigation }) {
       
       {error ? (
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>🚨 {error}</Text>
+          <Text style={styles.errorText}>{error}</Text>
         </View>
       ) : null}
       

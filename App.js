@@ -17,7 +17,6 @@ import CalendarScreen from './screens/CalendarScreen';
 import ProfileScreen from './screens/ProfilePage/ProfileScreen';
 import EditProfileScreen from './screens/ProfilePage/EditProfileScreen';
 import NotificationScreen from './screens/ProfilePage/NotificationsScreen';
-import QuickEntriesScreen from './screens/ProfilePage/QuickEntriesScreen';
 import AccessibilityScreen  from './screens/ProfilePage/AccessibilityScreen';
 import HelpAndSupportScreen from './screens/ProfilePage/HelpAndSupportScreen';
 import PrivacyAndDataScreen from './screens/ProfilePage/PrivacyAndDataScreen';
@@ -161,11 +160,6 @@ export default function App() {
                 <RootStack.Screen
                   name="Notification"
                   component={NotificationScreen}
-                  options={{headerShown: false}}
-                />
-                <RootStack.Screen
-                  name="QuickEntries"
-                  component={QuickEntriesScreen}
                   options={{headerShown: false}}
                 />
                 <RootStack.Screen

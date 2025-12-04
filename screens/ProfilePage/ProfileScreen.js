@@ -122,15 +122,6 @@ export default function ProfileScreen({ navigation }) {
               <View style={styles.settingsList}>
                 <TouchableOpacity 
                   style={styles.settingItem}
-                  onPress={() => navigation.navigate('QuickEntries')}
-                >
-                  <Text style={styles.settingLabel}>
-                    Quick Entries
-                  </Text>
-                  <Ionicons name="chevron-forward" size={20} color="#999" />
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={styles.settingItem}
                   onPress={() => navigation.navigate('Notification')}
                 >
                   <Text style={styles.settingLabel}>

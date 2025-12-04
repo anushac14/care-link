@@ -88,7 +88,7 @@ export default function TeamScreen() {
   const renderMember = ({ item }) => (
     <View style={styles.memberContainer}>
       <View style={styles.avatar}>
-        <CustomText size={1.1} style={styles.avatarText}>
+        <CustomText size={1.3} style={styles.avatarText}>
           {getInitials(item.name)}
         </CustomText>
       </View>
@@ -113,7 +113,7 @@ export default function TeamScreen() {
         <View style={styles.headerContainer}>
           <View style={styles.headerTextContainer}>
             <CustomText size="h2" style={styles.header}>Care Team</CustomText>
-            <CustomText size="caption" style={styles.subHeader}>
+            <CustomText size="body" style={styles.subHeader}>
               {teamMembers.length} Member{teamMembers.length !== 1 ? 's' : ''}
             </CustomText>
           </View>
@@ -215,7 +215,6 @@ const styles = StyleSheet.create({
   },
   avatarText: {
     color: '#fff',
-    fontWeight: 'bold',
   },
   memberInfo: {
     flex: 1,
