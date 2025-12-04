@@ -12,7 +12,7 @@ export default function EditProfileScreen({ navigation, route }) {
   const [formData, setFormData] = useState({
     firstName: firstName,
     lastName: lastName,
-    email: route.params?.email || 'johnsmith@gmail.com',
+    email: route.params?.email || '',
   });
   const [loading, setLoading] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingVertical: 10,
     minHeight: 48,
   },
   inputLabel: {
