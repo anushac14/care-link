@@ -231,7 +231,7 @@ export default function ReportScreen({ navigation }) {
                     <View style={styles.summaryContainer}>
                         <ActivityIndicator size="small" color="#007bff" />
                         <CustomText size="caption" style={styles.loadingText}>
-                            Analyzing entries with Gemini...
+                            Generating summary!
                         </CustomText>
                     </View>
                 )}
