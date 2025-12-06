@@ -7,13 +7,14 @@ import TopBarLayout from '../components/TopBarLayout';
 import CustomText from '../components/CustomText';
 
 const tagColors = {
-    Mood: '#42B826',
-    Sleep: '#957CF4',
-    Medication: '#1050DC',
-    Activity: '#85BEFF',
-    Meal: '#F3932C',
-    Behavior: '#DE3627',
-    Appointment: '#EEB62B'
+    Mood: '#DAEEAC',
+    Sleep: '#E2D2F3',
+    Medication: '#B4CBFF',
+    Activity: '#D4EFFF',
+    Meal: '#FBD9A6',
+    Behavior: '#FFC2C3',
+    Appointment: '#FFEAB1',
+    General:'#bfbfbfff'
 };
 
 const INITIAL_DATE = dayjs().format('YYYY-MM-DD');
@@ -427,7 +428,7 @@ const calendarStyles = StyleSheet.create({
         marginBottom: 7,
     },
     tagText: {
-        color: "#fff",
+        color: "#000",
         fontWeight: "500",
     },
     

@@ -221,7 +221,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 0,
     elevation: 10,
     backgroundColor: '#fff',
-    paddingBottom: 25, 
-    paddingTop: 10,
+    paddingBottom: 25,
   }
 });
